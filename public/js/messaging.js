@@ -2,25 +2,25 @@ angular.module('pubnub', [])
 .factory('Messaging', function($http) {
 
 	var Messaging = {};
-	var pchannel = '';
+	var channel = '';
 	var pubnub = PUBNUB.init({
-		publish_key : 'usepubkeyhere',
-		subscribe_key :  'usesubkeyhere'
+		subscribe_key :  'sub'
 	});
 
 	Messaging.publish = function (msg) {
-		$http.post('/pushmessage', {channel : pchannel, message : msg})
+		$http.post('/publish', { channel : channel, message : msg})
 	}
 
-	Messaging.subscribe = function (callback, joinAction, channel) {
-		pchannel = channel;
+	Messaging.subscribe = function (options) {
+		console.log(options);
+		channel = options.channel;
 		pubnub.subscribe({
-			channel : channel,
-			message : callback,
-			connect : joinAction,
-			presence : function (message) {
-				console.log('this is presence' + message, true)
-			}
+			channel : options.channel,
+			message : options.message,
+			connect : options.connect,
+			disconnect : options.disconnect,
+			reconnect : options.reconnect,
+			presence : options.presence
 		});
 	};	
 

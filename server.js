@@ -1,10 +1,9 @@
 var http = require('http'), 
-	express = require('express'), 
-	routes = require('./routes'), 
+	express = require('express'),
   path = require('path')
   pubnub = require("pubnub").init({
-    publish_key : "usepubkeyhere", 
-    subscribe_key : "usesubkeyhere"
+    publish_key : "pub", 
+    subscribe_key : "sub"
   });
 
 //create the express app
@@ -32,19 +31,20 @@ app.configure('development', function(){
 app.get('/', function (req, res){
   res.render('index.html'); 
 });
-app.post('/pushmessage', function (req, res) {
-  //console.log(req.body);
+app.post('/publish', function (req, res) {
+  console.log(req.body);
   
   //TODO: make sure we validate this....
   var payload = {
     channel : req.body.channel,
-    message : req.body.message,
+    message : req.body.message
     //debubing purposes only.
-    callback : function (m) {
-      console.log(m);
-    }
+    //callback : function (m) {}
   };
   pubnub.publish(payload);
+
+  //we don't need to wait for the call back to send the ok, we fire and forget.
+  res.send("ok");
 });
 
 //Start the server:

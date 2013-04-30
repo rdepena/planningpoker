@@ -3,9 +3,9 @@ angular.module('planning', ['pubnub']).config(function($routeProvider){
 	$routeProvider
 	.when('/', { controller : createCtrl, templateUrl : 'templates/createjoin.html' })
 	.when('/channel/:channelId/:userName', {controller : channelCtrl, templateUrl: 'templates/channel.html'})
-	.when('/channel/:channelId/:userName/:host', {controller : channelCtrl, templateUrl: 'templates/channel.html'})
+	.when('/channel/:channelId/:userName/:master', {controller : channelCtrl, templateUrl: 'templates/channel.html'})
 	.when('/join/:channelId', { controller : joinCtrl, templateUrl : 'templates/createjoin.html'})
-	.otherwise({redirectTo:'fourofour'});
+	.otherwise({redirectTo:'fourowfour'});
 });	
 	
 	
@@ -31,24 +31,41 @@ function joinCtrl ($scope, $location, $routeParams) {
 function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	$scope.currentUser = { name : $routeParams.userName };
 	$scope.channelId = $routeParams.channelId;
-	$scope.isHost = $routeParams.host === 'true';
-	console.log($scope.isHost);
+	$scope.isMaster = $routeParams.master === 'true';
 	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?'];
 	$scope.users = [];
 
-	//we take action on Another user joining.
-	var userJoined = function (message) {
-		if(!userExists(message.name, function(){;})) {
-			addUser({name : message.name});
+	//UI events:
+
+	//sends the vote message.
+	$scope.vote = function(card) {
+		$scope.currentUser.vote = card;
+		Messaging.publish({eventType : 'vote', vote : card, name : $scope.currentUser.name});
+	}
+	//TODO: work on a naming convention.
+	$scope.toggleVotes = function () {
+		if($scope.isMaster) {
+			//TODO: this is not the best way to accomplish this.
+			$scope.revealed = !$scope.revealed ;
+			Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
+		}
+	}
+	$scope.resetVotes = function () {
+		if($scope.isMaster) {
+			Messaging.publish({eventType : 'reset'});
 		}
 	}
 
+	//private functions:
+
+	//Adds a user to the current user list.
 	var addUser = function (user) {
 		$scope.$apply(function (){
 			$scope.users.push(user);
 		});
 	}
 
+	//checks if a user exists in the current user list, callback upon finding him
 	var userExists = function (name, onExists) {
 		var retuser;
 		angular.forEach($scope.users, function(u){
@@ -60,8 +77,17 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		return retuser; 
 	}
 
+	//Events Triggered by Messaging:
+
+	//we take action on Another user joining.
+	var onPeerJoin = function (message) {
+		if(!userExists(message.name, function(){;})) {
+			addUser({name : message.name});
+		}
+	}
+
 	//we take action on another user voting.
-	var userVoted = function (message) {
+	var onPeerVote = function (message) {
 		var user = userExists(message.name, function(u){
 			//u.name = "updated";
 			$scope.$apply(function () {
@@ -73,16 +99,19 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		}
 	}
 	//action to be executed upon joining the channel
-	var joinAction = function () {
+	var onConnect = function () {
 		Messaging.publish({ eventType : 'join', name : $scope.currentUser.name });
 	};
 
-	var toggleEvent = function (message) {
+	//visibility has been toggled by the master
+	var onToggle = function (message) {
 		$scope.$apply(function() {
 			$scope.revealed = message.reveal;	
 		})
 	};
-	var resetEvent = function (message) {
+
+	//vote reset has been initiated by master
+	var onReset = function (message) {
 		$scope.$apply(function (){
 			$scope.currentUser.vote = '';
 			angular.forEach($scope.users, function(u){
@@ -91,38 +120,51 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 			})
 		});
 	}
-	//sets up the events to listen to.
-	var subscribeAction = function(message) {
+
+	//TODO: display better error messages.
+	var onDisconnect = function (message) {
+		//TODO: implement better error messaging.
+		console.log(message);
+	}
+
+	//TODO: 
+	var onReconnect = function (message) {
+		//TODO: implement better error messaging.
+		console.log(message);
+	}
+
+	var onPresence = function (message) {
+		//TODO: use presence to determine who is on.
+		console.log(message);
+	}
+
+
+	
+	//All messages will be processed.
+	var onMessage = function(message) {
+
+		//determine what event has taken place
 		if(message.eventType === 'vote') {
-			userVoted(message);
+			onPeerVote(message);
 		}
 		if(message.eventType === 'join' && message.name !== $scope.currentUser.name) {
-			userJoined(message);
+			onPeerJoin(message);
 		}
 		if(message.eventType === 'toggle') {
-			toggleEvent(message);
+			onToggle(message);
 		}
 		if(message.eventType === 'reset') {
-			resetEvent(message);
+			onReset(message);
 		}
 	}	
-	//sends the vote message.
-	$scope.vote = function(card) {
-		$scope.currentUser.vote = card;
-		Messaging.publish({eventType : 'vote', vote : card, name : $scope.currentUser.name});
-	}
-	//TODO: work on a naming convention.
-	$scope.toggleVotes = function () {
-		if($scope.isHost) {
-			$scope.revealed = !$scope.revealed ;
-			Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
-		}
-	}
-	$scope.resetVotes = function () {
-		if($scope.isHost) {
-			Messaging.publish({eventType : 'reset'});
-		}
-	}
 	//sets up the messaging subscription.
-	Messaging.subscribe(subscribeAction, joinAction, $scope.channelId);
+	var options = {
+		channel : $scope.channelId,
+		message : onMessage,
+		connect : onConnect, 
+		disconnect : onDisconnect, 
+		reconnect : onReconnect, 
+		presence : onPresence
+	}
+	Messaging.subscribe(options);
 }

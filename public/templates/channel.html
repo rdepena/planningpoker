@@ -9,8 +9,8 @@
 		send this link so that other can join <a href="#/join/{{channelId}}" > Join the planning</a>
 	</p>
 	<p>
-		<button ng-show="isHost" class="btn btn-primary" ng-click='toggleVotes()'>Toggle vote visibility</button>
-		<button ng-show="isHost" class="btn btn-primary" ng-click='resetVotes()'>Reset</button>
+		<button ng-show="isMaster" class="btn btn-primary" ng-click='toggleVotes()'>Toggle vote visibility</button>
+		<button ng-show="isMaster" class="btn btn-primary" ng-click='resetVotes()'>Reset</button>
 	</p>
 	<ul>
 		<li ng-repeat="user in users"><span>{{user.name}}</span><span ng-show='revealed'>  Voted : {{user.vote}}</span></li>
