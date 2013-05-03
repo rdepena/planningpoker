@@ -42,10 +42,10 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		Messaging.publish({eventType : 'vote', vote : card, name : $scope.currentUser.name});
 	}
 	//TODO: work on a naming convention.
-	$scope.toggleVotes = function () {
+	$scope.toggleVotes = function (val) {
 		if($scope.isMaster) {
 			//TODO: this is not the best way to accomplish this.
-			$scope.revealed = !$scope.revealed ;
+			$scope.revealed = val ;
 			Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
 		}
 	}
