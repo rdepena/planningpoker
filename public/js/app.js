@@ -33,8 +33,7 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	$scope.channelId = $routeParams.channelId;
 	$scope.isMaster = $routeParams.master === 'true';
 	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
-	$scope.users = [];
-
+	$scope.users = [$scope.currentUser];
 	//UI events:
 
 	//sends the vote message.
