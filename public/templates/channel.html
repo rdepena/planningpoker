@@ -1,18 +1,35 @@
 <div>
 	<p>
-		{{currentUser.name}} voted: {{currentUser.vote}}.
+		{{currentUser.name}} voted: {{currentUser.vote}}
 	</p>
 	<div class="btn-group">
-	    <button ng-click="vote(card)" ng-repeat="card in cards">{{card}}</button>
+	    <button ng-click="vote(card)" class="btn btn-small" ng-class="{'btn-success' : currentUser.vote == card}" ng-repeat="card in cards">{{card}}</button>
 	</div>
 	<p>
-		send this link so that others can <a href="#/join/{{channelId}}" >Join the planning</a>
+		send this link so that others can <a target="_blank" href="#/join/{{channelId}}" >join the planning</a>
 	</p>
-	<p>
-		<button ng-show="isMaster" class="btn btn-primary" ng-click='toggleVotes()'>Toggle vote visibility</button>
-		<button ng-show="isMaster" class="btn btn-primary" ng-click='resetVotes()'>Reset</button>
-	</p>
-	<ul>
-		<li ng-repeat="user in users"><span>{{user.name}}</span><span ng-show='revealed'>  Voted : {{user.vote}}</span></li>
-	</ul>
+	<div>
+		<button ng-show="(isMaster && !revealed)" class="btn btn-primary" ng-click='toggleVotes(true)'>reveal</button>
+		<button ng-show="(isMaster && revealed)" class="btn btn-primary" ng-click='toggleVotes(false)'>hide</button>
+		<button ng-show="isMaster" class="btn btn-primary" ng-click='resetVotes()'>reset</button>
+	</div>
+	<table class="table table-striped table-condensed table-bordered" style="width:30%">
+	<thead>
+		<th>
+			participant
+		</th>
+		<th>
+			vote
+		</th>
+	</thead>
+		<tr ng-repeat="user in users | orderBy: user.vote:reverse">
+			<td >{{user.name}}</td> 
+			<td>
+				<!-- Different states that the participant can be in. !-->
+				<span ng-show='revealed' class="badge badge-info">{{user.vote}}</span>
+				<span ng-show="(user.vote != null && !revealed)" class="badge">voted</span>
+				<span ng-show="(user.vote == null)" class="badge badge-inverse">joined</span>
+			</td>
+		</tr>
+	</table>
 </div>

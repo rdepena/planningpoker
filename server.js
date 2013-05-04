@@ -1,5 +1,5 @@
 var http = require('http'), 
-	express = require('express'),
+  express = require('express'),
   path = require('path')
   pubnub = require("pubnub").init({
     publish_key : "pub", 
@@ -11,7 +11,6 @@ var app = express();
 
 //configure the express app
 app.configure(function(){
-  app.set('port', process.env.PORT || 1337);
   app.set('views', __dirname + '/views');
   app.engine('html', require('ejs').renderFile);
   app.use(express.favicon());
@@ -23,7 +22,7 @@ app.configure(function(){
 });
 
 app.configure('development', function(){
-	app.use(express.errorHandler());
+  app.use(express.errorHandler());
 });
   
 //Routes:
@@ -32,7 +31,7 @@ app.get('/', function (req, res){
   res.render('index.html'); 
 });
 app.post('/publish', function (req, res) {
-  console.log(req.body);
+  console.log(req.body);  
   
   //TODO: make sure we validate this....
   var payload = {
@@ -48,6 +47,7 @@ app.post('/publish', function (req, res) {
 });
 
 //Start the server:
-http.createServer(app).listen(app.get('port'), function(){
-	console.log("express server listening on port " + app.get('port'));
+var port = process.env.PORT || 5000;
+http.createServer(app).listen(port, function(){
+  console.log("express server listening on port " + port);
 });

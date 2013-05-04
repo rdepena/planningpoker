@@ -32,9 +32,8 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	$scope.currentUser = { name : $routeParams.userName };
 	$scope.channelId = $routeParams.channelId;
 	$scope.isMaster = $routeParams.master === 'true';
-	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?'];
-	$scope.users = [];
-
+	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
+	$scope.users = [$scope.currentUser];
 	//UI events:
 
 	//sends the vote message.
@@ -43,10 +42,10 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		Messaging.publish({eventType : 'vote', vote : card, name : $scope.currentUser.name});
 	}
 	//TODO: work on a naming convention.
-	$scope.toggleVotes = function () {
+	$scope.toggleVotes = function (val) {
 		if($scope.isMaster) {
 			//TODO: this is not the best way to accomplish this.
-			$scope.revealed = !$scope.revealed ;
+			$scope.revealed = val ;
 			Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
 		}
 	}
@@ -77,12 +76,17 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		return retuser; 
 	}
 
+	var userAttendance = function () {
+		Messaging.publish({ eventType : 'join', name : $scope.currentUser.name });
+	}
+
 	//Events Triggered by Messaging:
 
 	//we take action on Another user joining.
 	var onPeerJoin = function (message) {
 		if(!userExists(message.name, function(){;})) {
 			addUser({name : message.name});
+			userAttendance();
 		}
 	}
 
@@ -100,7 +104,7 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	}
 	//action to be executed upon joining the channel
 	var onConnect = function () {
-		Messaging.publish({ eventType : 'join', name : $scope.currentUser.name });
+		userAttendance();
 	};
 
 	//visibility has been toggled by the master
@@ -113,9 +117,9 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	//vote reset has been initiated by master
 	var onReset = function (message) {
 		$scope.$apply(function (){
-			$scope.currentUser.vote = '';
+			$scope.currentUser.vote = null;
 			angular.forEach($scope.users, function(u){
-				u.vote = '';
+				u.vote = null;
 				$scope.revealed = false;
 			})
 		});
@@ -132,13 +136,6 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		//TODO: implement better error messaging.
 		console.log(message);
 	}
-
-	var onPresence = function (message) {
-		//TODO: use presence to determine who is on.
-		console.log(message);
-	}
-
-
 	
 	//All messages will be processed.
 	var onMessage = function(message) {
@@ -163,8 +160,7 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 		message : onMessage,
 		connect : onConnect, 
 		disconnect : onDisconnect, 
-		reconnect : onReconnect, 
-		presence : onPresence
+		reconnect : onReconnect
 	}
 	Messaging.subscribe(options);
 }
