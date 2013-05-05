@@ -11,7 +11,6 @@ angular.module('timer', [])
 
 	//private functions:
 	var tick = function () {
-		console.log(self.seconds);
 		if(self.seconds === 0) {
 			self.doneCallback(self.seconds);
 			return;
@@ -29,7 +28,6 @@ angular.module('timer', [])
 		self.seconds = seconds;
 		self.doneCallback = onFinish;
 		self.tickCallback = onTick;
-		console.log("Started timer");
 		self.stopTimer = false;
 		tick();
 

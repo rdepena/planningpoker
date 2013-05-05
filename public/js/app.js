@@ -29,17 +29,18 @@ function joinCtrl ($scope, $location, $routeParams) {
 
 //Channel controller.
 function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
+	
+	//scope variables:
 	$scope.currentUser = { name : $routeParams.userName };
 	$scope.channelId = $routeParams.channelId;
 	$scope.isMaster = $routeParams.master === 'true';
+	//TODO: configure different card 'decks'
 	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
 	$scope.users = [$scope.currentUser];
 	$scope.time = {
 		minutes : 1,
 		seconds : 0
 	};
-
-
 
 	//UI events:
 	$scope.startTimer = function () {
@@ -169,13 +170,13 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 	//TODO: display better error messages.
 	var onDisconnect = function (message) {
 		//TODO: implement better error messaging.
-		console.log(message);
+		console.log('connected');
 	}
 
 	//TODO: 
 	var onReconnect = function (message) {
 		//TODO: implement better error messaging.
-		console.log(message);
+		console.log('disconnected');
 	}
 	
 	//All messages will be processed.
