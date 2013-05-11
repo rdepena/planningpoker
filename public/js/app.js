@@ -202,7 +202,8 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 		message : onMessage,
 		connect : onConnect, 
 		disconnect : onDisconnect, 
-		reconnect : onReconnect
+		reconnect : onReconnect,
+		keepAlive : $scope.isMaster
 	}
 	Messaging.subscribe(options);
 }
