@@ -41,6 +41,8 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 		minutes : 1,
 		seconds : 0
 	};
+	//Todo:Get better name.
+	$scope.voteSummary = [];
 
 	//UI events:
 	$scope.startTimer = function () {
@@ -86,6 +88,33 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 	var addUser = function (user) {
 		$scope.$apply(function (){
 			$scope.users.push(user);
+		});
+	}
+
+	var getVoteGroupIndex = function (vote) {
+		var retValue = null;
+		angular.forEach($scope.voteSummary, function (v) {
+			if (v.vote == vote) {
+				retValue = v;
+			}
+		});
+
+		return retValue;
+	};
+	
+	var generateVoteSummary = function () {
+		$scope.voteSummary = []
+		angular.forEach($scope.users, function (u) {
+			var existingVoteCount = getVoteGroupIndex(u.vote);
+			if(existingVoteCount) {
+				existingVoteCount.count++;
+			}
+			else {
+				$scope.voteSummary.push({
+					vote : u.vote,
+					count : 1  
+				});
+			}
 		});
 	}
 
@@ -143,6 +172,10 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 		if(!user) {
 			addUser({ name : message.name, vote : message.vote });
 		}
+		//Make sure that the summaries are updated.
+		$scope.$apply(function () {
+			generateVoteSummary();
+		});
 	}
 	//action to be executed upon joining the channel
 	var onConnect = function () {
