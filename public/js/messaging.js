@@ -22,16 +22,14 @@ angular.module('pubnub', [])
 			presence : options.presence
 		});
 
-		var minutes = 60;
 		//keep alive hack : will remove this once I re-write this using socket IO or comparable solution.
 		var keepAlive = function () {
-			if(minutes > 0) {
-				Messaging.publish("ka");
-				minutes--;
-				setTimeout(keepAlive, 60000);
-			}
+			Messaging.publish("k");
+			setTimeout(keepAlive, 60000);
 		}
-		setTimeout(keepAlive, 60000);
+		if(options.keepAlive) {
+			setTimeout(keepAlive, 60000);
+		}	
 	};	
 
 	return Messaging;
