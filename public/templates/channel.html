@@ -3,7 +3,7 @@
  	 	<div class="row-fluid">
 			<div class="span6">
 				<p> 
-					participating as {{currentUser.name}}
+					<b>participating as {{currentUser.name}}:</b>
 				</p>
 				<div class="btn-group">
 				    <button ng-click="vote(card)" class="btn btn-small" 
@@ -46,19 +46,19 @@
 					</tbody>
 				</table>
 				<div ng-show='revealed'>
-					<span>vote summary:</span>
+					<b>vote summary:</b>
 					<table class="table table-striped table-condensed table-bordered" style="width:40%">
 						<thead>
-							<th>vote</th>
 							<th>count</th>
+							<th>vote</th>
 						</thead>
 						<tbody>
-							<tr ng-repeat="voteSum in voteSummary | orderBy:'count':true">
-								<td>
-									<span>{{voteSum.vote}}<span>
-								</td>
+							<tr ng-repeat="voteSum in voteSummary | orderBy:'count':true" ng-show="voteSum.vote">
 								<td>
 									<span >{{voteSum.count}}</span>
+								</td>
+								<td>
+									<span>{{voteSum.vote}}<span>
 								</td>
 							</tr>
 						</tbody>
