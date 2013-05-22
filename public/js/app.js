@@ -1,10 +1,10 @@
 //Todo: Create Modules.
 angular.module('planning', ['pubnub', 'timer']).config(function($routeProvider){
 	$routeProvider
-	.when('/', { controller : createCtrl, templateUrl : '/templates/createjoin.html' })
-	.when('/channel/:channelId/:userName', {controller : channelCtrl, templateUrl: '/templates/channel.html'})
-	.when('/channel/:channelId/:userName/:master', {controller : channelCtrl, templateUrl: '/templates/channel.html'})
-	.when('/join/:channelId', { controller : joinCtrl, templateUrl : '/templates/createjoin.html'})
+	.when('/', { controller : createCtrl, templateUrl : 'createjoin.html' })
+	.when('/channel/:channelId/:userName', {controller : channelCtrl, templateUrl: 'channel.html'})
+	.when('/channel/:channelId/:userName/:master', {controller : channelCtrl, templateUrl: 'channel.html'})
+	.when('/join/:channelId', { controller : joinCtrl, templateUrl : 'createjoin.html'})
 	.otherwise({redirectTo:'fourowfour'});
 });	
 	
