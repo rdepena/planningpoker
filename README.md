@@ -1,7 +1,9 @@
-planningpoker
+http://planningshark.com
 =============
 
-Planning poker app.
+Planning poker app built using AngularJS/Node.js.
+
+
 
 To get this running you will need:
 
