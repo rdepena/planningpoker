@@ -12,8 +12,8 @@
     </style>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
     <script src="js/messaging.js"></script>
-    <script src="js/app.js"></script> 
     <script src="js/timer.js"></script> 
+    <script src="js/app.js"></script> 
   </head>
   <body ng-app="planning">
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -64,13 +64,7 @@
               <br>
             </div>
             <div class="span6" ng-show="isMaster">
-              <p>
-                timer
-                <button ng-click="addMinutes()" class="btn btn-small">+1</button>
-                <strong>{{timeFormat(time.minutes)}}:{{timeFormat(time.seconds)}}</strong>
-                <button ng-click="startTimer()" class='btn btn-small btn-primary'>start</button>
-                <button ng-click="resetTimer()" class="btn btn-small btn-inverse">reset</button>
-              </p>
+            <simpletimer></simpletimer>
             </div>
           </div>
           <div class="row-fluid">

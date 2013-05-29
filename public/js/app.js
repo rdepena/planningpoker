@@ -1,12 +1,13 @@
 //Todo: Create Modules.
-angular.module('planning', ['pubnub', 'timer']).config(function($routeProvider){
+angular.module('planning', ['pubnub']).config(function($routeProvider){
 	$routeProvider
 	.when('/', { controller : createCtrl, templateUrl : 'createjoin.html' })
 	.when('/channel/:channelId/:userName', {controller : channelCtrl, templateUrl: 'channel.html'})
 	.when('/channel/:channelId/:userName/:master', {controller : channelCtrl, templateUrl: 'channel.html'})
 	.when('/join/:channelId', { controller : joinCtrl, templateUrl : 'createjoin.html'})
 	.otherwise({redirectTo:'fourowfour'});
-});	
+})
+.directive("simpletimer", simpleTimer);
 	
 	
 //Create controller.
@@ -28,7 +29,7 @@ function joinCtrl ($scope, $location, $routeParams) {
 }
 
 //Channel controller.
-function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
+function channelCtrl($scope, $http, $location, $routeParams, Messaging) {
 	
 	//scope variables:
 	$scope.currentUser = { name : $routeParams.userName };
@@ -37,32 +38,10 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 	//TODO: configure different card 'decks'
 	$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
 	$scope.users = [$scope.currentUser];
-	$scope.time = {
-		minutes : 1,
-		seconds : 0
-	};
 	//Todo:Get better name.
 	$scope.voteSummary = [];
 
 	//UI events:
-	$scope.startTimer = function () {
-		var timeInSeconds = $scope.time.minutes  * 60;
-		Timer.start(timeInSeconds, onTimerDone, onTimerTick);
-	}
-	//TODO: can this be a directive?
-	$scope.timeFormat = function (t) {
-		return t < 9 ? "0" + t : t;
-	}
-	//Adds one minute to the timer.
-	$scope.addMinutes = function() {
-		$scope.time.minutes++;
-		Timer.addTime(60);
-	};
-	$scope.resetTimer = function () {
-		Timer.stop();
-		$scope.time.minutes = 1;
-		$scope.time.seconds = 0;
-	}
 	//sends the vote message.
 	$scope.vote = function(card) {
 		$scope.currentUser.vote = card;
@@ -117,23 +96,6 @@ function channelCtrl($scope, $http, $location, $routeParams, Messaging, Timer) {
 			}
 		});
 	}
-
-	var onTimerTick = function (timeInSeconds) {
-		var update = function () {
-			$scope.time.minutes = Math.floor(timeInSeconds / 60);
-			$scope.time.seconds = timeInSeconds % 60;
-		}
-		 var phase = $scope.$root.$$phase;
-		  if(phase == '$apply' || phase == '$digest') {
-		      update();
-		  } else {
-		    $scope.$apply(update);
-		  }
-	}
-
-	var onTimerDone = function () {
-		alert('ding!');
-	};
 
 	//checks if a user exists in the current user list, callback upon finding him
 	var userExists = function (name, onExists) {
