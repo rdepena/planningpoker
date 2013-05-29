@@ -10,13 +10,14 @@ var simpleTimer = function () {
                 '<button ng-click="startTimer()" class="btn btn-small btn-primary">start</button>' +
                 '<button ng-click="resetTimer()" class="btn btn-small btn-inverse">reset</button>' + 
              '</p>',
+        replace : true,
 		controller : function ($scope) {
 			self = this;
-			var Timer = {};
+			self.running = false;
 			self.seconds = 0;
 			self.stopTimer = false;
 
-			//is this neccessary ? 
+			//model object of time.
 			$scope.time = {
 				minutes : 1,
 				seconds : 0
@@ -24,11 +25,14 @@ var simpleTimer = function () {
 
 			//private functions:
 			var tick = function () {
+				self.running = true;
 				if(self.seconds === 0) {
 					alert('ding');
+					self.running = false;
 					return;
 				}
 				if (self.stopTimer) {
+					self.running = false;
 					return;
 				}
 				self.seconds--;
@@ -42,14 +46,16 @@ var simpleTimer = function () {
 				  } else {
 				    $scope.$apply(update);
 				  }
-				console.log("tick");
 				setTimeout(tick, 1000);
 			}
 			$scope.startTimer = function () {
-				var timeInSeconds = $scope.time.minutes  * 60;
-				self.seconds = timeInSeconds;
-				self.stopTimer = false;
-				tick();
+				console.log(self.running);
+				if (!self.running) {
+					var timeInSeconds = $scope.time.minutes  * 60;
+					self.seconds = timeInSeconds;
+					self.stopTimer = false;
+					tick();
+				}
 			}
 			$scope.timeFormat = function (t) {
 				return t < 9 ? "0" + t : t;
@@ -64,7 +70,6 @@ var simpleTimer = function () {
 				$scope.time.minutes = 1;
 				$scope.time.seconds = 0;
 			}
-		},
-		replace : true
+		}
 	}
 }
