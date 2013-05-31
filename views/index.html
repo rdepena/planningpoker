@@ -12,10 +12,11 @@
     </style>
         <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.0.6/angular.min.js"></script>
     <script src="js/messaging.js"></script>
-    <script src="js/timer.js"></script> 
-    <script src="js/app.js"></script> 
+    <script src="js/directives.js"></script> 
+    <script src="js/app.js"></script>
+    <script src="js/poker.js"></script>
   </head>
-  <body ng-app="planning">
+  <body ng-app="planningShark">
     <div class="navbar navbar-inverse navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -64,7 +65,7 @@
               <br>
             </div>
             <div class="span6" ng-show="isMaster">
-            <simpletimer></simpletimer>
+            <div ps-timer></div>
             </div>
           </div>
           <div class="row-fluid">
