@@ -1,3 +1,4 @@
+//this object's responsability is to be a container of our directives.
 (function (planningShark) {
 
 	//not sure if this is the only place I will declare directives so don't overwrite them.
@@ -28,6 +29,8 @@
 				};
 
 				//private functions:
+
+				//will execute every second and update scope variables.
 				var tick = function () {
 					self.running = true;
 					if(self.seconds === 0) {
@@ -53,6 +56,9 @@
 					setTimeout(tick, 1000);
 				};
 
+				//model functions:
+
+				//initiates the timer.
 				$scope.startTimer = function () {
 					if (!self.running) {
 						var timeInSeconds = $scope.time.minutes  * 60;
@@ -62,6 +68,7 @@
 					}
 				};
 
+				//Todo:convert this into a filter.
 				$scope.timeFormat = function (t) {
 					return t < 9 ? "0" + t : t;
 				};
@@ -72,6 +79,7 @@
 					self.seconds += 60;
 				};
 
+				//stops the timer then resets it to 60 seconds.
 				$scope.resetTimer = function () {
 					self.stopTimer = true;
 					$scope.time.minutes = 1;
@@ -80,4 +88,5 @@
 			}
 		}
 	}
+
 })(this.planningShark = this.planningShark || {});

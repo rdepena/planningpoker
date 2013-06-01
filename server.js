@@ -26,7 +26,6 @@ app.configure('development', function(){
 });
   
 //Routes:
-//TODO: seperate this into files.
 app.get('/', function (req, res){
   res.render('index.html'); 
 });
@@ -37,8 +36,6 @@ app.post('/publish', function (req, res) {
   var payload = {
     channel : req.body.channel,
     message : req.body.message
-    //debubing purposes only.
-    //callback : function (m) {}
   };
   pubnub.publish(payload);
 

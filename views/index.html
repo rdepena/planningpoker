@@ -29,10 +29,8 @@
           <div class="nav-collapse collapse">
             <ul class="nav">
               <li class="active"><a href="#">start</a></li>
-<!--               <li><a href="#about">About</a></li>
-              <li><a href="#contact">Contact</a></li> -->
             </ul>
-          </div><!--/.nav-collapse -->
+          </div>
         </div>
       </div>
     </div>
@@ -41,6 +39,7 @@
         This is a planning poker app, lets start by adding a create channel screen.
       </p>
     </div>
+    <!-- ng-templates -->
     <script type="text/ng-template" id="createjoin.html">
       <form ng-submit="join()">
         <label for="userName">User Name</label>
@@ -100,20 +99,20 @@
                     <th>vote</th>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="voteSum in voteSummary | orderBy:'count':true" ng-show="voteSum.vote">
+                    <tr ng-repeat="voteCount in voteCounts | orderBy:'count':true" ng-show="voteCount.vote">
                       <td>
-                        <span >{{voteSum.count}}</span>
+                        <span >{{voteCount.count}}</span>
                       </td>
                       <td>
-                        <span>{{voteSum.vote}}<span>
+                        <span>{{voteCount.vote}}<span>
                       </td>
                     </tr>
                   </tbody>
                 </table>
               </div>
               <div>
-                <button ng-show="(isMaster && !revealed)" class="btn btn-primary" ng-click='toggleVotes(true)'>reveal</button>
-                <button ng-show="(isMaster && revealed)" class="btn btn-primary" ng-click='toggleVotes(false)'>hide</button>
+                <button ng-show="(isMaster && !revealed)" class="btn btn-primary" ng-click='toggleVoteVisibility(true)'>reveal</button>
+                <button ng-show="(isMaster && revealed)" class="btn btn-primary" ng-click='toggleVoteVisibility(false)'>hide</button>
                 <button ng-show="isMaster" class="btn btn-inverse" ng-click='resetVotes()'>reset</button>
                 <p>
                   send this link so that others can <a target="_blank" href="#/join/{{channelId}}" >join the planning</a>
@@ -124,6 +123,7 @@
         </div>
       </div>
     </script>
+    <!-- end ng-templates -->
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="//netdna.bootstrapcdn.com/twitter-bootstrap/2.3.2/js/bootstrap.min.js"></script>
     <script src="http://cdn.pubnub.com/pubnub-3.4.min.js"></script>

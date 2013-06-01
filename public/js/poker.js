@@ -1,28 +1,33 @@
 (function (planningShark) {
-	//poker is our planning poker module.
+
+	//poker contains all the functionality related specifically with planning poker.
 	planningShark.poker =  {};
+
+	//createCtrl is in charge of creating the channel.
 	planningShark.poker.createCtrl = function ($scope, $location) {
 
+		//we create a random string to be used as a channel ID.
 		$scope.join = function() {
 			$location.path('/channel/' + Math.random().toString(36).substring(7) + '/' + $scope.userName + '/true');
 		};
 	};
 
-	//Join controller.
+	//joinCtrl is in charge of how users join existing channels.
 	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams) {
 	
+		//this property represents the existing channel Id that we will join.
 		$scope.channelId = $routeParams.channelId;
-
+		//we join a channel that has been passed via the route params.
 		$scope.join = function () {
 			//TODO: find a way to add this to a module, think messaging or planning.....?
 			$location.path('/channel/' + $scope.channelId + '/' + $scope.userName); 
 		};
 	};
 
-	//Channel controller.
+	//channelCtrl is responsible for all events and actions you can take while in a channel.
 	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, Messaging) {
 	
-		//scope variables:
+		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
 		$scope.channelId = $routeParams.channelId;
 		$scope.isMaster = $routeParams.master === 'true';
@@ -30,23 +35,26 @@
 		$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
 		$scope.users = [$scope.currentUser];
 		//Todo:Get better name.
-		$scope.voteSummary = [];
+		$scope.voteCounts = [];
 
-		//UI events:
-		//sends the vote message.
+		//public functions:
+
+		//handles the voting logic
 		$scope.vote = function(card) {
 			$scope.currentUser.vote = card;
 			Messaging.publish({eventType : 'vote', vote : card, name : $scope.currentUser.name});
 		}
-		//TODO: work on a naming convention.
-		$scope.toggleVotes = function (val) {
+		//accepts true or false and changes the state of vote visibility accordingly 
+		$scope.toggleVoteVisibility = function (val) {
+			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
-				//TODO: this is not the best way to accomplish this.
 				$scope.revealed = val ;
 				Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
 			}
 		}
+		//handles the reset vote logic.
 		$scope.resetVotes = function () {
+			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
 				Messaging.publish({eventType : 'reset'});
 			}
@@ -61,28 +69,30 @@
 			});
 		}
 
-		var getVoteGroupIndex = function (vote) {
-			var retValue = null;
-			angular.forEach($scope.voteSummary, function (v) {
-				if (v.vote == vote) {
-					retValue = v;
-				}
-			});
+		//generates a summary view of the votes.
+		var generatevoteCounts = function () {
+			//we clear the existing vote summary
+			$scope.voteCounts = []
 
-			return retValue;
-		};
-	
-		var generateVoteSummary = function () {
-			$scope.voteSummary = []
+			//loop each user and determine what they voted.
 			angular.forEach($scope.users, function (u) {
-				var existingVoteCount = getVoteGroupIndex(u.vote);
-				if(existingVoteCount) {
-					existingVoteCount.count++;
+			
+				//we check to see if this vote is alredy 
+				var vote = null;
+				angular.forEach($scope.voteCounts, function (v) {
+					if (v.vote == u.vote) {
+						vote = v;					}
+				});
+
+				//if a user already voted using this value add 1 to it.
+				if (vote != null) {
+					vote.count++;
 				}
+				//if its the first or only user voting for this number add it to the vote summary.
 				else {
-					$scope.voteSummary.push({
+					$scope.voteCounts.push({
 						vote : u.vote,
-						count : 1  
+						count : 1
 					});
 				}
 			});
@@ -100,22 +110,25 @@
 			return retuser; 
 		}
 
-		var userAttendance = function () {
+		//anounce to everyone in the channel that a particular user has joined.
+		var anounceAttendance = function () {
 			Messaging.publish({ eventType : 'join', name : $scope.currentUser.name });
 		}
 
-		//Events Triggered by Messaging:
+
+		//Event handlers to react to messaging.
 
 		//we take action on Another user joining.
 		var onPeerJoin = function (message) {
 			if(!userExists(message.name, function(){;})) {
 				addUser({name : message.name});
-				userAttendance();
+				anounceAttendance();
 			}
 		}
 
 		//we take action on another user voting.
 		var onPeerVote = function (message) {
+			console.log("peer vote");
 			var user = userExists(message.name, function(u){
 				//u.name = "updated";
 				$scope.$apply(function () {
@@ -127,12 +140,12 @@
 			}
 			//Make sure that the summaries are updated.
 			$scope.$apply(function () {
-				generateVoteSummary();
+				generatevoteCounts();
 			});
 		}
 		//action to be executed upon joining the channel
 		var onConnect = function () {
-			userAttendance();
+			anounceAttendance();
 		};
 
 		//visibility has been toggled by the master
@@ -166,7 +179,7 @@
 		}
 		
 		//All messages will be processed.
-		var onMessage = function(message) {
+		var processMessage = function(message) {
 
 			//determine what event has taken place
 			if(message.eventType === 'vote') {
@@ -185,12 +198,13 @@
 		//sets up the messaging subscription.
 		var options = {
 			channel : $scope.channelId,
-			message : onMessage,
+			message : processMessage,
 			connect : onConnect, 
 			disconnect : onDisconnect, 
 			reconnect : onReconnect,
 			keepAlive : $scope.isMaster
 		}
+		//we use messaging to abstract any subscription policy.
 		Messaging.subscribe(options);
 	}
 	
