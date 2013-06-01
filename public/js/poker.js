@@ -128,7 +128,6 @@
 
 		//we take action on another user voting.
 		var onPeerVote = function (message) {
-			console.log("peer vote");
 			var user = userExists(message.name, function(u){
 				//u.name = "updated";
 				$scope.$apply(function () {
