@@ -17,8 +17,8 @@ app.configure(function(){
   app.use(express.logger('dev'));
   app.use(express.bodyParser());
   app.use(express.methodOverride());
-  app.use(app.router);
   app.use(express.static(path.join(__dirname, 'public')));
+   app.use(app.router);
 });
 
 app.configure('development', function(){
@@ -41,6 +41,10 @@ app.post('/publish', function (req, res) {
 
   //we don't need to wait for the call back to send the ok, we fire and forget.
   res.send("ok");
+});
+
+app.get('*', function(req, res){
+  res.render('404.html');
 });
 
 //Start the server:

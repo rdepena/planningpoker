@@ -11,7 +11,7 @@
 				'<p>' +
 	                'timer' +
 	                '<button ng-click="addMinutes()" class="btn btn-small">+1</button>' +
-	                '<strong>{{timeFormat(time.minutes)}}:{{timeFormat(time.seconds)}}</strong>' +
+	                '<strong>{{time.minutes | timerFormat}}:{{time.seconds | timerFormat}}</strong>' +
 	                '<button ng-click="startTimer()" class="btn btn-small btn-primary">start</button>' +
 	                '<button ng-click="resetTimer()" class="btn btn-small btn-inverse">reset</button>' + 
 	             '</p>',
@@ -68,11 +68,6 @@
 					}
 				};
 
-				//Todo:convert this into a filter.
-				$scope.timeFormat = function (t) {
-					return t < 9 ? "0" + t : t;
-				};
-
 				//Adds one minute to the timer.
 				$scope.addMinutes = function() {
 					$scope.time.minutes++;
@@ -88,5 +83,12 @@
 			}
 		}
 	}
+	//this filter is a pre-requisit for the timer
+	planningShark.directives.timerFormat = function () {  
+		return function (input) {
+			return input < 9 ? "0" + input : input;
+		}
+	};
+
 
 })(this.planningShark = this.planningShark || {});
