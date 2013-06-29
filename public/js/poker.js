@@ -25,14 +25,14 @@
 	};
 
 	//channelCtrl is responsible for all events and actions you can take while in a channel.
-	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, Messaging) {
-	
+	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, Messaging, events, deck) {
+
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
 		$scope.channelId = $routeParams.channelId;
 		$scope.isMaster = $routeParams.master === 'true';
 		//TODO: configure different card 'decks'
-		$scope.cards = ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee'];
+		$scope.deck = deck;
 		$scope.users = [$scope.currentUser];
 		//Todo:Get better name.
 		$scope.voteCounts = [];
@@ -49,14 +49,18 @@
 			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
 				$scope.revealed = val ;
-				Messaging.publish({eventType : 'toggle', reveal : $scope.revealed });
+				Messaging.publish(
+				{
+					eventType : events.VOTE_VISIBILITY_TOGGLE, 
+					reveal : $scope.revealed 
+				});
 			}
 		}
 		//handles the reset vote logic.
 		$scope.resetVotes = function () {
 			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
-				Messaging.publish({eventType : 'reset'});
+				Messaging.publish({eventType : events.VOTE});
 			}
 		}
 
@@ -112,15 +116,18 @@
 
 		//anounce to everyone in the channel that a particular user has joined.
 		var anounceAttendance = function () {
-			Messaging.publish({ eventType : 'join', name : $scope.currentUser.name });
+			Messaging.publish(
+				{ 
+					eventType : events.USER_VOTE, 
+					name : $scope.currentUser.name 
+				});
 		}
-
 
 		//Event handlers to react to messaging.
 
 		//we take action on Another user joining.
 		var onPeerJoin = function (message) {
-			if(!userExists(message.name, function(){;})) {
+			if(!userExists(message.name, angular.noop)) {
 				addUser({name : message.name});
 				anounceAttendance();
 			}
@@ -135,7 +142,10 @@
 				});
 			});
 			if(!user) {
-				addUser({ name : message.name, vote : message.vote });
+				addUser(
+					{ name : message.name, 
+						vote : message.vote
+					});
 			}
 			//Make sure that the summaries are updated.
 			$scope.$apply(function () {
@@ -181,16 +191,16 @@
 		var processMessage = function(message) {
 
 			//determine what event has taken place
-			if(message.eventType === 'vote') {
+			if(message.eventType === events.VOTE) {
 				onPeerVote(message);
 			}
-			if(message.eventType === 'join' && message.name !== $scope.currentUser.name) {
+			if(message.eventType === events.USER_JOIN && message.name !== $scope.currentUser.name) {
 				onPeerJoin(message);
 			}
-			if(message.eventType === 'toggle') {
+			if(message.eventType === events.VOTE_VISIBILITY_TOGGLE) {
 				onToggle(message);
 			}
-			if(message.eventType === 'reset') {
+			if(message.eventType === events.RESET_VOTE) {
 				onReset(message);
 			}
 		}	

@@ -12,8 +12,14 @@
 		.otherwise({redirectTo:'/'});
 	});
 
-	//configure directives:
-	planningShark.app.directive("psTimer", planningShark.directives.simpleTimer);
-	planningShark.app.filter('timerFormat', planningShark.directives.timerFormat);
+	//set up constants:
+	planningShark.app.constant('events', 
+		{ 
+			RESET_VOTE : 'reset',
+			VOTE : 'vote',
+			USER_JOIN : 'join',
+			VOTE_VISIBILITY_TOGGLE : 'toggle'
+		});
+	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee']);
 
 })(this.planningShark = this.planningShark || {});
