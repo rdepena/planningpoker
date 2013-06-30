@@ -26,7 +26,6 @@
 
 	//channelCtrl is responsible for all events and actions you can take while in a channel.
 	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, deck, pubsub, participants) {
-
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
 		participants.add($scope.currentUser);
@@ -78,6 +77,9 @@
 
 		pubsub.subscribe(events.USER_JOIN, function (message) {
 			$scope.$apply(function() {
+				if(!participants.participantExists(message.name)) {
+					socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name });
+				}
 				participants.add(
 				{
 					name : message.name,
@@ -107,11 +109,7 @@
 				pubsub.publish(message.eventType, message);
 			},
 			connect : function () {
-				socket.publish(
-					{ 
-						eventType : events.USER_JOIN, 
-						name : $scope.currentUser.name 
-					})
+				socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name })
 			}, 
 			keepAlive : $scope.isMaster
 		}

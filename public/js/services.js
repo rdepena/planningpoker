@@ -80,7 +80,7 @@
 		};
 
 		//helper functions:
-		var participantExists = function (name, onExists) {
+		my.participantExists = function (name, onExists) {
 			var retparticipant;
 			angular.forEach(my.participantList, function(p){
 				if(p.name === name) {
@@ -94,13 +94,13 @@
 		}
 
 		my.add = function (participant) {
-			if(!participantExists(participant.name)) {
+			if(!my.participantExists(participant.name)) {
 				my.participantList.push(participant);
 			}
 		};
 
 		my.updateVote = function (participant) {
-			var existingParticipant = participantExists(participant.name);
+			var existingParticipant = my.participantExists(participant.name);
 			if(existingParticipant) {
 				existingParticipant.vote = participant.vote;
 			}
@@ -126,7 +126,7 @@
 		var room = '';
 
 		//init the connection.
-		var socket = io.connect('http://localhost');
+		var socket = io.connect(window.location.hostname);
 
 		my.subscribe = function (options) {
 			room = options.channel;
