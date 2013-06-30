@@ -25,7 +25,7 @@
 	};
 
 	//channelCtrl is responsible for all events and actions you can take while in a channel.
-	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, Messaging, events, deck, pubsub, participants) {
+	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, deck, pubsub, participants) {
 
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
@@ -40,14 +40,14 @@
 		//handles the voting logic
 		$scope.vote = function(card) {
 			$scope.currentUser.vote = card;
-			Messaging.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
+			socket.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
 		};
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.toggleVoteVisibility = function (val) {
 			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
 				$scope.revealed = val;
-				Messaging.publish(
+				socket.publish(
 				{
 					eventType : events.VOTE_VISIBILITY_TOGGLE, 
 					reveal : $scope.revealed 
@@ -59,7 +59,7 @@
 			//only allow this if its the 'scrum' master
 			participants.resetVotes();
 			if($scope.isMaster) {
-				Messaging.publish({eventType : events.VOTE_RESET});
+				socket.publish({eventType : events.VOTE_RESET});
 			}
 		};
 
@@ -100,14 +100,14 @@
 			});
 		});
 
-		//sets up the messaging subscription.
+		//sets up the socket subscription.
 		var options = {
 			channel : $scope.channelId,
 			message : function (message) {
 				pubsub.publish(message.eventType, message);
 			},
 			connect : function () {
-				Messaging.publish(
+				socket.publish(
 					{ 
 						eventType : events.USER_JOIN, 
 						name : $scope.currentUser.name 
@@ -115,8 +115,9 @@
 			}, 
 			keepAlive : $scope.isMaster
 		}
-		//we use messaging to abstract any subscription policy.
-		Messaging.subscribe(options);
+		//we use socket to abstract any subscription policy.
+		socket.subscribe(options);
+
 	};
 	
 })(this.planningShark = this.planningShark || {});

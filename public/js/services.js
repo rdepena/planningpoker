@@ -118,49 +118,42 @@
 		return my;
 
 	});
-
-	planningShark.services.factory('Messaging', function($http) {
-
-		//we will return this object, add any public properties/methods to it.
+	
+	planningShark.services.factory('socket', function(){
 		var my = {};
-		//we hold a copy of the channel as to not request it on every call
-		var channel = '';
-		//pubnub configuration.
-		var pubnub = PUBNUB.init({
-			subscribe_key :  ""
-		});
 
-		//we publish to our node instance not pubnub.
-		my.publish = function (msg) {
-			$http.post('/publish', { channel : channel, message : msg})
-		}
+		//we will use rooms to isolate messages.
+		var room = '';
 
-		//we subscribe directly to pubnub.
+		//init the connection.
+		var socket = io.connect('http://localhost');
+
 		my.subscribe = function (options) {
-			//local variable saves the channel for latter use.
-			channel = options.channel;
-
-			//configure pubnub subscription.
-			pubnub.subscribe({
-				channel : options.channel,
-				message : options.message,
-				connect : options.connect,
-				disconnect : options.disconnect,
-				reconnect : options.reconnect,
-				presence : options.presence
+			room = options.channel;
+			socket.on('event', function(data) {
+				if(angular.isFunction(options.message)) {
+					options.message(data.message);
+				}
 			});
+			socket.emit('joinRoom', room);
+			socket.on('connect', function (){
+				if(angular.isFunction(options.connect)) {
+					options.connect();
+				}
+			});
+		};
 
-			//keep alive hack : will remove this once I re-write this using socket IO or comparable solution.
-			var keepAlive = function () {
-				my.publish("k");
-				setTimeout(keepAlive, 60000);
-			}
-			if(options.keepAlive) {
-				setTimeout(keepAlive, 60000);
-			}	
-		};	
+		my.publish = function (msg) {
+			socket.emit('broadcast', 
+			{
+				room : room,
+				message : msg
+			});
+		};
+
 		return my;
 	});
+
 
 	return planningShark.services;
 

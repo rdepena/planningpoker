@@ -1,10 +1,6 @@
 var http = require('http'), 
   express = require('express'),
-  path = require('path')
-  pubnub = require("pubnub").init({
-    publish_key : "pub", 
-    subscribe_key : "sub"
-  });
+  path = require('path');
 
 //create the express app
 var app = express();
@@ -29,19 +25,6 @@ app.configure('development', function(){
 app.get('/', function (req, res){
   res.render('index.html'); 
 });
-app.post('/publish', function (req, res) {
-  console.log(req.body);  
-  
-  //TODO: make sure we validate this....
-  var payload = {
-    channel : req.body.channel,
-    message : req.body.message
-  };
-  pubnub.publish(payload);
-
-  //we don't need to wait for the call back to send the ok, we fire and forget.
-  res.send("ok");
-});
 
 app.get('*', function(req, res){
   res.render('404.html');
@@ -49,6 +32,27 @@ app.get('*', function(req, res){
 
 //Start the server:
 var port = process.env.PORT || 5000;
-http.createServer(app).listen(port, function(){
+var server = http.createServer(app).listen(port, function(){
   console.log("express server listening on port " + port);
 });
+
+//Sockets
+var io = require('socket.io').listen(server); 
+io.sockets.on('connection', function (socket) {
+  socket.on('broadcast', function (data) {
+    io.sockets.in(data.room).emit('event', data)
+  });
+  socket.on('joinRoom', function (room) {
+    socket.set('room', room, function (){
+      console.log('room is created ' + room);
+    });
+    socket.join(room);
+  });
+});
+
+
+
+
+
+
+
