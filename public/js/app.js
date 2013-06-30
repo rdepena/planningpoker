@@ -1,6 +1,6 @@
 (function (planningShark) {
 	//we create our planning poker app
-	planningShark.app = angular.module('planningShark', ['pubnub']);
+	planningShark.app = angular.module('planningShark', ['services']);
 
 	//configure our planning module.:
 	planningShark.app.config( function ($routeProvider) {
@@ -13,13 +13,15 @@
 	});
 
 	//set up constants:
+	//application events.
 	planningShark.app.constant('events', 
 		{ 
-			RESET_VOTE : 'reset',
+			VOTE_RESET : 'reset',
 			VOTE : 'vote',
 			USER_JOIN : 'join',
 			VOTE_VISIBILITY_TOGGLE : 'toggle'
 		});
+	//card deck.
 	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee']);
 
 })(this.planningShark = this.planningShark || {});
