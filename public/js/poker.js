@@ -98,6 +98,7 @@
 		pubsub.subscribe(events.VOTE_RESET, function (message) {
 			$scope.$apply(function() {
 				participants.resetVotes();
+				$scope.toggleVoteVisibility(false);
 				$scope.voteCounts = participants.voteCount();
 			});
 		});
