@@ -1,6 +1,9 @@
 var http = require('http'), 
   express = require('express'),
-  path = require('path');
+  path = require('path'),
+  roomCache = require('./poker/rooms'),
+  emitter = require("events").EventEmitter,
+  _events = new emitter();
 
 //create the express app
 var app = express();
@@ -30,6 +33,22 @@ app.get('*', function(req, res){
   res.render('404.html');
 });
 
+//TODO: Get these functions out of here:
+//Server side events: 
+//Cache logic:
+var onUserUpdate = function (roomName, user) {
+  roomCache.addUpdateUser(roomName, user);
+}
+
+var onUserJoin = function (roomName, user) {
+  onUserUpdate(roomName, user);
+  return roomCache.roomByName(roomName);
+}
+
+var updateVoteVisibility = function (roomName, visible) {
+  roomCache.roomByName(roomName).displayVotes = visible;
+}
+
 //Start the server:
 var port = process.env.PORT || 5000;
 var server = http.createServer(app).listen(port, function(){
@@ -45,12 +64,35 @@ io.configure(function () {
 });
 io.sockets.on('connection', function (socket) {
   socket.on('broadcast', function (data) {
-    io.sockets.in(data.room).emit('event', data)
+    if(data.message.eventType === 'join') {
+
+      socket.emit('event', {
+        message : {
+          eventType : 'roomStatus', 
+          room : onUserJoin(data.room, { 
+            name : data.message.name, 
+            vote : data.message.vote
+          })
+        }
+      });
+    }
+    else if(data.message.eventType === 'vote') {
+      onUserUpdate(data.room, { 
+        name : data.message.name, 
+        vote : data.message.vote
+      });
+    }
+    else if(data.message.eventType === 'toggle') {
+      updateVoteVisibility(data.room, data.message.reveal);
+    }
+    io.sockets.in(data.room).emit('event', data);
+    //rooms[data.room].participants.push()
+    console.log(rooms);
   });
-  socket.on('joinRoom', function (room) {
-    socket.set('room', room, function (){
-      console.log('room is created ' + room);
-    });
-    socket.join(room);
+  
+  //when user joins the room
+  socket.on('joinRoom', function (data) {
+    socket.set('room', data.room, function (){});
+    socket.join(data.room);
   });
 });

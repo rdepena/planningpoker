@@ -94,9 +94,11 @@
 		}
 
 		my.add = function (participant) {
-			if(!my.participantExists(participant.name)) {
+			var existingParticipant = my.participantExists(participant.name);
+			if(!existingParticipant) {
 				my.participantList.push(participant);
 			}
+			else my.updateVote(existingParticipant);
 		};
 
 		my.updateVote = function (participant) {
@@ -131,11 +133,12 @@
 		my.subscribe = function (options) {
 			room = options.channel;
 			socket.on('event', function(data) {
+				console.log(data);
 				if(angular.isFunction(options.message)) {
 					options.message(data.message);
 				}
 			});
-			socket.emit('joinRoom', room);
+			socket.emit('joinRoom', { room : room , name : name });
 			socket.on('connect', function (){
 				if(angular.isFunction(options.connect)) {
 					options.connect();

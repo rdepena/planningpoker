@@ -77,11 +77,7 @@
 
 		pubsub.subscribe(events.USER_JOIN, function (message) {
 			$scope.$apply(function() {
-				if(!participants.participantExists(message.name)) {
-					socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name });
-				}
-				participants.add(
-				{
+				participants.add({
 					name : message.name,
 					vote : message.vote
 				});
@@ -103,16 +99,31 @@
 			});
 		});
 
+		pubsub.subscribe(events.ROOM_STATUS, function (message){
+			console.log("I joined and received:");
+			console.log(message);
+			angular.forEach(message.room.participants, function (p) {
+				console.log(p);
+				participants.add ({
+					name : p.name,
+					vote : p.vote
+				});
+			});
+			$scope.revealed = message.room.displayVotes;
+		});
+
 		//sets up the socket subscription.
 		var options = {
 			channel : $scope.channelId,
 			message : function (message) {
+				console.log(message);
 				pubsub.publish(message.eventType, message);
 			},
 			connect : function () {
 				socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name })
 			}, 
-			keepAlive : $scope.isMaster
+			keepAlive : $scope.isMaster, 
+			userName : $scope.currentUser.name
 		}
 		//we use socket to abstract any subscription policy.
 		socket.subscribe(options);
