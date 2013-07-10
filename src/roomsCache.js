@@ -32,12 +32,17 @@ module.exports = function () {
         room.participants[p].vote = null;
       }
     }
+  };
+
+  var updateVoteVisibility = function (roomName, votesVisible) {
+    getRoomByName(roomName).displayVotes = votesVisible;
   }
 
   return {
     addUpdateUser : addUpdateUser,
     getRoomByName : getRoomByName,
-    resetVotes : resetVotes
+    resetVotes : resetVotes,
+    updateVoteVisibility : updateVoteVisibility
   };
 
 }();

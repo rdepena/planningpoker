@@ -111,8 +111,8 @@
                 </table>
               </div>
               <div>
-                <button ng-show="(isMaster && !revealed)" class="btn btn-primary" ng-click='toggleVoteVisibility(true)'>reveal</button>
-                <button ng-show="(isMaster && revealed)" class="btn btn-primary" ng-click='toggleVoteVisibility(false)'>hide</button>
+                <button ng-show="(isMaster && !revealed)" class="btn btn-primary" ng-click='updateVoteVisibility(true)'>reveal</button>
+                <button ng-show="(isMaster && revealed)" class="btn btn-primary" ng-click='updateVoteVisibility(false)'>hide</button>
                 <button ng-show="isMaster" class="btn btn-inverse" ng-click='resetVotes()'>reset</button>
                 <p>
                   send this link so that others can <a target="_blank" href="#/join/{{channelId}}" >join the planning</a>

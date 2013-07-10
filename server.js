@@ -76,7 +76,7 @@ io.sockets.on('connection', function (socket) {
     }
     //if the visibility of the votes has changed.
     else if(data.message.eventType === 'toggle') {
-      roomCache.getRoomByName(roomName).displayVotes = data.message.reveal;
+      roomCache.updateVoteVisibility(roomName, data.message.reveal);
     }
     //if the vote reset was effected.
     else if(data.message.eventType === 'reset') {

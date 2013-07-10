@@ -42,7 +42,7 @@
 			socket.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
 		};
 		//accepts true or false and changes the state of vote visibility accordingly 
-		$scope.toggleVoteVisibility = function (val) {
+		$scope.updateVoteVisibility = function (val) {
 			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
 				$scope.revealed = val;
@@ -63,7 +63,6 @@
 		};
 
 		//subscribe to messages: 
-
 		pubsub.subscribe(events.VOTE, function (message) {
 			$scope.$apply(function() {
 				participants.updateVote(
@@ -94,7 +93,7 @@
 		pubsub.subscribe(events.VOTE_RESET, function (message) {
 			$scope.$apply(function() {
 				participants.resetVotes();
-				$scope.toggleVoteVisibility(false);
+				$scope.updateVoteVisibility(false);
 				$scope.voteCounts = participants.voteCount();
 			});
 		});
