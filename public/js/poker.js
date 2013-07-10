@@ -100,10 +100,7 @@
 		});
 
 		pubsub.subscribe(events.ROOM_STATUS, function (message){
-			console.log("I joined and received:");
-			console.log(message);
 			angular.forEach(message.room.participants, function (p) {
-				console.log(p);
 				participants.add ({
 					name : p.name,
 					vote : p.vote
@@ -116,7 +113,6 @@
 		var options = {
 			channel : $scope.channelId,
 			message : function (message) {
-				console.log(message);
 				pubsub.publish(message.eventType, message);
 			},
 			connect : function () {

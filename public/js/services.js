@@ -133,7 +133,6 @@
 		my.subscribe = function (options) {
 			room = options.channel;
 			socket.on('event', function(data) {
-				console.log(data);
 				if(angular.isFunction(options.message)) {
 					options.message(data.message);
 				}

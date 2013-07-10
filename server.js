@@ -1,7 +1,7 @@
 var http = require('http'), 
   express = require('express'),
   path = require('path'),
-  roomCache = require('./poker/rooms'),
+  roomCache = require('./src/roomsCache'),
   emitter = require("events").EventEmitter,
   _events = new emitter();
 
@@ -33,21 +33,6 @@ app.get('*', function(req, res){
   res.render('404.html');
 });
 
-//TODO: Get these functions out of here:
-//Server side events: 
-//Cache logic:
-var onUserUpdate = function (roomName, user) {
-  roomCache.addUpdateUser(roomName, user);
-}
-
-var onUserJoin = function (roomName, user) {
-  onUserUpdate(roomName, user);
-  return roomCache.roomByName(roomName);
-}
-
-var updateVoteVisibility = function (roomName, visible) {
-  roomCache.roomByName(roomName).displayVotes = visible;
-}
 
 //Start the server:
 var port = process.env.PORT || 5000;
@@ -64,30 +49,42 @@ io.configure(function () {
 });
 io.sockets.on('connection', function (socket) {
   socket.on('broadcast', function (data) {
-    if(data.message.eventType === 'join') {
 
+    //get the roomName from the payload.
+    var roomName = data.room;
+
+    //get the user object form the payload.
+    var user = {
+      name : data.message.name || null,
+      vote : data.message.vote || null
+    };
+    //if a user joins:
+    if(data.message.eventType === 'join') {
+      //we add the user to the room:
+      roomCache.addUpdateUser(roomName, user)
+      //respond to the user who joined with the curroomName status.
       socket.emit('event', {
         message : {
           eventType : 'roomStatus', 
-          room : onUserJoin(data.room, { 
-            name : data.message.name, 
-            vote : data.message.vote
-          })
+          room : roomCache.getRoomByName(roomName)
         }
       });
     }
+    //if a user votes:
     else if(data.message.eventType === 'vote') {
-      onUserUpdate(data.room, { 
-        name : data.message.name, 
-        vote : data.message.vote
-      });
+      roomCache.addUpdateUser(roomName,user);
     }
+    //if the visibility of the votes has changed.
     else if(data.message.eventType === 'toggle') {
-      updateVoteVisibility(data.room, data.message.reveal);
+      roomCache.getRoomByName(roomName).displayVotes = data.message.reveal;
     }
-    io.sockets.in(data.room).emit('event', data);
-    //rooms[data.room].participants.push()
-    console.log(rooms);
+    //if the vote reset was effected.
+    else if(data.message.eventType === 'reset') {
+      roomCache.resetVotes(roomName);
+    }
+
+    //we emit the event to the other clients.
+    io.sockets.in(roomName).emit('event', data);
   });
   
   //when user joins the room
