@@ -1,6 +1,6 @@
 (function (planningShark) {
 	//we create our planning poker app
-	planningShark.app = angular.module('planningShark', ['services']);
+	planningShark.app = angular.module('planningShark', ['planningShark.services']);
 
 	//configure our planning module.:
 	planningShark.app.config( function ($routeProvider) {

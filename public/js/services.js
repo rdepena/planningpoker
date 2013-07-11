@@ -2,7 +2,7 @@
 
 'use strict';
  
-	planningShark.services = angular.module("services", []);
+	planningShark.services = angular.module("planningShark.services", []);
 	
 	//register other services here...
 	
