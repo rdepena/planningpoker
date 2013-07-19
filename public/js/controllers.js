@@ -4,28 +4,38 @@
 	planningShark.poker =  {};
 
 	//createCtrl is in charge of creating the channel.
-	planningShark.poker.createCtrl = function ($scope, $location) {
-
+	planningShark.poker.createCtrl = function ($scope, $location, cookies) {
+		$scope.openSessions = cookies.get();
 		//we create a random string to be used as a channel ID.
 		$scope.join = function() {
-			$location.path('/channel/' + Math.random().toString(36).substring(7) + '/' + $scope.userName + '/true');
+			var roomName = Math.random().toString(36).substring(7);
+			var path = '/channel/' + roomName + '/' + $scope.userName + '/true';
+			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
+			$location.path(path);
 		};
+
+		$scope.delete = function (cookie) {
+			cookies.remove(cookie.name);
+			$scope.openSessions = cookies.get();
+		}
 	};
 
 	//joinCtrl is in charge of how users join existing channels.
-	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams) {
+	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams, cookies) {
 	
 		//this property represents the existing channel Id that we will join.
 		$scope.channelId = $routeParams.channelId;
 		//we join a channel that has been passed via the route params.
 		$scope.join = function () {
-			//TODO: find a way to add this to a module, think messaging or planning.....?
-			$location.path('/channel/' + $scope.channelId + '/' + $scope.userName); 
-		};
+			var roomName = $scope.channelId;
+			var path = '/channel/' + $scope.channelId + '/' + $scope.userName;
+			cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
+			$location.path(path); 
+		};	
 	};
 
 	//channelCtrl is responsible for all events and actions you can take while in a channel.
-	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, deck, pubsub, participants) {
+	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, deck, pubsub, participants, cookies) {
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
 		participants.add($scope.currentUser);

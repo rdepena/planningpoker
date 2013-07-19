@@ -48,6 +48,49 @@
 		return my;
 	});
 
+	planningShark.services.factory('room', function (participants, socket, events){
+		var my = {};
+
+		my.participants = [];
+
+		my.join = function (roomName, path, user) {
+			//save a cookie so we can display recent sessions
+			cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
+			participants.add(user);
+		};
+
+		my.vote = function (card, user) {
+			user.vote = card;
+			//we send the vote over the wire
+			//TODO: send user not card/name combo.
+			socket.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
+		};
+
+		my.updateVoteVisibility = function (voteVisible) {
+
+			//send update over the wire.
+			socket.publish(
+			{
+				eventType : events.VOTE_VISIBILITY_TOGGLE, 
+				reveal : voteVisible
+			});
+
+			//return parameter for chaining.
+			return voteVisible;
+		};
+
+		my.resetVotes = function (sendNotification){
+			participants.resetVotes();
+			if(sendNotification) {
+				socket.publish({eventType : events.VOTE_RESET});
+			}
+
+		}
+
+		return my;
+
+	});
+
 	planningShark.services.factory('participants', function (){
 		var my = {}
 
@@ -119,6 +162,35 @@
 
 		return my;
 
+	});
+
+	planningShark.services.factory('cookies', function(){
+		var my = {};
+		$.cookie.json = true;
+
+		my.add = function (name, value, options) {
+			$.cookie(name, value, options);
+		};
+
+		my.get = function (name) {
+			var cookiesArray = [],
+				currentCookies = $.cookie(name);
+			for (var c in currentCookies) {
+				if(currentCookies.hasOwnProperty(c)) {
+					//make sure the cookie has a path value.
+					if(currentCookies[c] && currentCookies[c].path) {
+						cookiesArray.push(currentCookies[c]);	
+					}
+				}
+			}
+			return cookiesArray;
+		};
+
+		my.remove = function (name) {
+			$.removeCookie(name);
+		}
+
+		return my;
 	});
 	
 	planningShark.services.factory('socket', function(){
