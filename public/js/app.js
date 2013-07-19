@@ -6,9 +6,9 @@
 	planningShark.app.config( function ($routeProvider) {
 		$routeProvider
 		.when('/', { controller : planningShark.poker.createCtrl, templateUrl : 'createjoin.html' })
-		.when('/channel/:channelId/:userName', {controller : planningShark.poker.channelCtrl, templateUrl: 'channel.html'})
-		.when('/channel/:channelId/:userName/:master', {controller : planningShark.poker.channelCtrl, templateUrl: 'channel.html'})
-		.when('/join/:channelId', { controller : planningShark.poker.joinCtrl, templateUrl : 'createjoin.html'})
+		.when('/room/:roomName/:userName', {controller : planningShark.poker.roomCtrl, templateUrl: 'room.html'})
+		.when('/room/:roomName/:userName/:master', {controller : planningShark.poker.roomCtrl, templateUrl: 'room.html'})
+		.when('/join/:roomName', { controller : planningShark.poker.joinCtrl, templateUrl : 'createjoin.html'})
 		.otherwise({redirectTo:'/'});
 	});
 

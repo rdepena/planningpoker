@@ -50,7 +50,7 @@
       <form ng-submit="join()">
         <label for="userName">User Name</label>
         <input type="text" name="userName" ng-model="userName" placeholder="who are you today?" required />
-        <input type="hidden" name="channelId" ng-model="channelId" />
+        <input type="hidden" name="roomName" ng-model="roomName" />
         <br>
         <button class='btn btn-primary'>Join</button>
         <!-- //todo: get this out of there. --> 
@@ -69,7 +69,7 @@
         </div>
       </form>
     </script>
-    <script type="text/ng-template" id="channel.html">
+    <script type="text/ng-template" id="room.html">
        <div class="row-fluid">
         <div class="span12">
           <div class="row-fluid">
@@ -134,7 +134,7 @@
                 <button ng-show="(isMaster && revealed())" class="btn btn-primary" ng-click='updateVoteVisibility(false)'>hide</button>
                 <button ng-show="isMaster" class="btn btn-inverse" ng-click='resetVotes()'>reset</button>
                 <p>
-                  send this link so that others can <a target="_blank" href="#/join/{{channelId}}" >join the planning</a>
+                  send this link so that others can <a target="_blank" href="#/join/{{roomName}}" >join the planning</a>
                 </p>
               </div>
             </div>

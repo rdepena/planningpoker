@@ -54,6 +54,7 @@
 		my.participants = [];
 		my.revealed = false;
 		my.voteCount = null;
+		my.roomName = null;
 
 		//private functions:
 		var participantExists = function (name, onExists) {
@@ -78,8 +79,13 @@
 
 		my.join = function (roomName, path, user) {
 			//save a cookie so we can display recent sessions
+
+			//TODO: get this from somewhere else.
+			my.roomName = roomName;
+
 			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
 			my.addUpdateParticipant(user);
+			socket.publish({ eventType : events.USER_JOIN, name : user.name })
 		};
 
 		my.vote = function (card, user) {
@@ -162,6 +168,7 @@
 		});
 
 		pubsub.subscribe(events.VOTE_RESET, function (message) {
+				console.log("I am here");
 				my.resetVotes();
 				my.revealed = false;
 		});
@@ -175,6 +182,24 @@
 			});
 			my.revealed = message.room.displayVotes;
 		});
+
+		my.setupRoom = function (roomName) {
+			
+			my.roomName = roomName;
+			my.participants = [];
+			my.revealed = false;
+			my.voteCount = null;
+
+			//sets up the socket subscription.
+			var options = {
+				roomName : my.roomName,
+				message : function (message) {
+						pubsub.publish(message.eventType, message);
+				}
+			}
+			//we use socket to abstract any subscription policy.
+			socket.subscribe(options);
+		};
 
 		return my;
 
@@ -209,7 +234,7 @@
 		return my;
 	});
 	
-	planningShark.services.factory('socket', function(){
+	planningShark.services.factory('socket', function($rootScope){
 		var my = {};
 
 		//we will use rooms to isolate messages.
@@ -219,17 +244,18 @@
 		var socket = io.connect(window.location.hostname);
 
 		my.subscribe = function (options) {
-			room = options.channel;
+			room = options.roomName;
 			socket.on('event', function(data) {
 				if(angular.isFunction(options.message)) {
+					$rootScope.$apply(function () {
 					options.message(data.message);
+					});
 				}
 			});
-			socket.emit('joinRoom', { room : room , name : name });
 			socket.on('connect', function (){
-				if(angular.isFunction(options.connect)) {
-					options.connect();
-				}
+				console.log("connected");
+				console.log(options.roomName);
+				socket.emit('joinRoom', { room : room });
 			});
 		};
 

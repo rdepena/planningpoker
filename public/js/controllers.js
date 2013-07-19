@@ -3,14 +3,13 @@
 	//poker contains all the functionality related specifically with planning poker.
 	planningShark.poker =  {};
 
-	//createCtrl is in charge of creating the channel.
+	//createCtrl is in charge of creating the room.
 	planningShark.poker.createCtrl = function ($scope, $location, cookies) {
 		$scope.openSessions = cookies.get();
-		//we create a random string to be used as a channel ID.
+		//we create a random string to be used as a room ID.
 		$scope.join = function() {
 			var roomName = Math.random().toString(36).substring(7);
-			var path = '/channel/' + roomName + '/' + $scope.userName + '/true';
-			//1
+			var path = '/room/' + roomName + '/' + $scope.userName + '/true';
 			$location.path(path);
 		};
 
@@ -21,38 +20,37 @@
 		}
 	};
 
-	//joinCtrl is in charge of how users join existing channels.
-	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams, cookies) {
+	//joinCtrl is in charge of how users join existing rooms.
+	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams) {
 	
-		//this property represents the existing channel Id that we will join.
-		$scope.channelId = $routeParams.channelId;
-		//we join a channel that has been passed via the route params.
+		//this property represents the existing room Id that we will join.
+		$scope.roomName = $routeParams.roomName;
+		//we join a room that has been passed via the route params.
 		$scope.join = function () {
-			var roomName = $scope.channelId;
-			var path = '/channel/' + $scope.channelId + '/' + $scope.userName;
-			//cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
+			var path = '/room/' + $scope.roomName + '/' + $scope.userName;
 			$location.path(path); 
 		};	
 	};
 
-	//channelCtrl is responsible for all events and actions you can take while in a channel.
-	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, pubsub, deck, room, cookies) {
+	//roomCtrl is responsible for all and actions you can take while in a room.
+	planningShark.poker.roomCtrl = function ($scope, $http, $location, $routeParams, deck, room) {
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
-		$scope.channelId = $routeParams.channelId;
+		$scope.roomName = $routeParams.roomName;
 		$scope.isMaster = $routeParams.master === 'true';
-		//TODO: configure different card 'decks'
 		$scope.deck = deck;
+
+		//join the room:
+		room.setupRoom($scope.roomName);
 		$scope.users = room.participants;
+		var path = '/room/' + $scope.roomName + '/' + $scope.currentUser.name;
+		room.join($scope.roomName, path, $scope.currentUser);
+
+		//scope functions:
+
 		$scope.revealed =  function () {
 			return room.revealed;
 		}
-		//Todo:Get better name.
-
-		//join the room:
-		var roomName = $scope.channelId;
-		var path = '/channel/' + $scope.channelId + '/' + $scope.userName;
-		room.join(roomName, path, $scope.currentUser);
 
 		//handles the voting logic
 		$scope.vote = function(card) {
@@ -61,34 +59,13 @@
 		};
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.updateVoteVisibility = function (val) {
-			//only allow this if its the 'scrum' master
-			if($scope.isMaster) {
-				room.updateVoteVisibility(val);
-			}
+			room.updateVoteVisibility(val);	
 		};
 		//handles the reset vote logic.
 		$scope.resetVotes = function () {
-			//only allow this if its the 'scrum' master
-			room.resetVotes();
+			//we send a value to send the notification.
+			room.resetVotes(true);
 		};
-
-		//sets up the socket subscription.
-		var options = {
-			channel : $scope.channelId,
-			message : function (message) {
-				$scope.$apply(function() {
-					pubsub.publish(message.eventType, message);
-				});
-			},
-			connect : function () {
-				socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name })
-			}, 
-			keepAlive : $scope.isMaster, 
-			userName : $scope.currentUser.name
-		}
-		//we use socket to abstract any subscription policy.
-		socket.subscribe(options);
-
 	};
 	
 })(this.planningShark = this.planningShark || {});

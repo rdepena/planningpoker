@@ -17,6 +17,7 @@ module.exports = function () {
     return getRoomByName(roomName).participants[user.name] = user;
   };
 
+  //returns the room by the given name
   var getRoomByName = function (roomName) {
     var room = rooms[roomName];
     if(!room) {
@@ -34,8 +35,8 @@ module.exports = function () {
     }
   };
 
-  var updateVoteVisibility = function (roomName, votesVisible) {
-    getRoomByName(roomName).displayVotes = votesVisible;
+  var updateVoteVisibility = function (roomName, voteVisible) {
+    getRoomByName(roomName).displayVotes = voteVisible;
   }
 
   return {
