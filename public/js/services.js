@@ -48,22 +48,45 @@
 		return my;
 	});
 
-	planningShark.services.factory('room', function (participants, socket, events){
+	planningShark.services.factory('room', function (socket, events, cookies, pubsub){
 		var my = {};
 
 		my.participants = [];
+		my.revealed = false;
+		my.voteCount = null;
+
+		//private functions:
+		var participantExists = function (name, onExists) {
+			var retparticipant;
+			angular.forEach(my.participants, function(p){
+				if(p.name === name) {
+					retparticipant = p;
+					if(angular.isFunction(onExists)) {
+						onExists(p);	
+					}
+				}
+			});
+			return retparticipant; 
+		}
+		my.addUpdateParticipant = function (participant) {
+			var existingParticipant = participantExists(participant.name);
+			if(!existingParticipant) {
+				my.participants.push(participant);
+			}
+			else existingParticipant.vote = participant.vote;;
+		};
 
 		my.join = function (roomName, path, user) {
 			//save a cookie so we can display recent sessions
-			cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
-			participants.add(user);
+			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
+			my.addUpdateParticipant(user);
 		};
 
 		my.vote = function (card, user) {
 			user.vote = card;
 			//we send the vote over the wire
 			//TODO: send user not card/name combo.
-			socket.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
+			socket.publish({eventType : events.VOTE, vote : card, name : user.name});
 		};
 
 		my.updateVoteVisibility = function (voteVisible) {
@@ -76,29 +99,23 @@
 			});
 
 			//return parameter for chaining.
-			return voteVisible;
+			my.revealed = voteVisible;
 		};
 
 		my.resetVotes = function (sendNotification){
-			participants.resetVotes();
+			angular.forEach(my.participants, function (p){
+				p.vote = null;
+			});
+			my.voteCount = null;
 			if(sendNotification) {
 				socket.publish({eventType : events.VOTE_RESET});
 			}
 
 		}
 
-		return my;
-
-	});
-
-	planningShark.services.factory('participants', function (){
-		var my = {}
-
-		my.participantList = [];
-
-		my.voteCount = function () {
+		var calcVoteCount = function () {
 			var vc = [];
-			angular.forEach(my.participantList, function(u) {
+			angular.forEach(my.participants, function(u) {
 				//we check to see if this vote is alredy 
 				var vote = null;
 				angular.forEach(vc, function (v) {
@@ -122,43 +139,42 @@
 			return vc;
 		};
 
-		//helper functions:
-		my.participantExists = function (name, onExists) {
-			var retparticipant;
-			angular.forEach(my.participantList, function(p){
-				if(p.name === name) {
-					retparticipant = p;
-					if(angular.isFunction(onExists)) {
-						onExists(p);	
-					}
-				}
+		//subscribe to messages: 
+		pubsub.subscribe(events.VOTE, function (message) {
+				my.addUpdateParticipant(
+					{
+						name : message.name,
+						vote : message.vote 
+					});
+				my.voteCount = calcVoteCount();
+		});
+
+		pubsub.subscribe(events.USER_JOIN, function (message) {
+				my.addUpdateParticipant({
+					name : message.name,
+					vote : message.vote
+				});
+		});
+
+		pubsub.subscribe(events.VOTE_VISIBILITY_TOGGLE, function (message) {
+				my.revealed = message.reveal;
+			
+		});
+
+		pubsub.subscribe(events.VOTE_RESET, function (message) {
+				my.resetVotes();
+				my.revealed = false;
+		});
+
+		pubsub.subscribe(events.ROOM_STATUS, function (message){
+			angular.forEach(message.room.participants, function (p) {
+				my.addUpdateParticipant ({
+					name : p.name,
+					vote : p.vote
+				});
 			});
-			return retparticipant; 
-		}
-
-		my.add = function (participant) {
-			var existingParticipant = my.participantExists(participant.name);
-			if(!existingParticipant) {
-				my.participantList.push(participant);
-			}
-			else my.updateVote(existingParticipant);
-		};
-
-		my.updateVote = function (participant) {
-			var existingParticipant = my.participantExists(participant.name);
-			if(existingParticipant) {
-				existingParticipant.vote = participant.vote;
-			}
-			else {
-				my.participantList.push(participant);
-			}
-		};
-
-		my.resetVotes = function () {
-			angular.forEach(my.participantList, function (p){
-				p.vote = null;
-			});
-		}
+			my.revealed = message.room.displayVotes;
+		});
 
 		return my;
 

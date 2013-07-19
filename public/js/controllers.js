@@ -10,11 +10,12 @@
 		$scope.join = function() {
 			var roomName = Math.random().toString(36).substring(7);
 			var path = '/channel/' + roomName + '/' + $scope.userName + '/true';
-			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
+			//1
 			$location.path(path);
 		};
 
 		$scope.delete = function (cookie) {
+			console.log(cookie);
 			cookies.remove(cookie.name);
 			$scope.openSessions = cookies.get();
 		}
@@ -29,100 +30,55 @@
 		$scope.join = function () {
 			var roomName = $scope.channelId;
 			var path = '/channel/' + $scope.channelId + '/' + $scope.userName;
-			cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
+			//cookies.add(roomName, { path: path, joinDate : Date.now()}, {expires : 1});
 			$location.path(path); 
 		};	
 	};
 
 	//channelCtrl is responsible for all events and actions you can take while in a channel.
-	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, deck, pubsub, participants, cookies) {
+	planningShark.poker.channelCtrl = function ($scope, $http, $location, $routeParams, socket, events, pubsub, deck, room, cookies) {
 		//public members:
 		$scope.currentUser = { name : $routeParams.userName };
-		participants.add($scope.currentUser);
 		$scope.channelId = $routeParams.channelId;
 		$scope.isMaster = $routeParams.master === 'true';
 		//TODO: configure different card 'decks'
 		$scope.deck = deck;
-		$scope.users = participants.participantList;
+		$scope.users = room.participants;
+		$scope.revealed =  function () {
+			return room.revealed;
+		}
 		//Todo:Get better name.
+
+		//join the room:
+		var roomName = $scope.channelId;
+		var path = '/channel/' + $scope.channelId + '/' + $scope.userName;
+		room.join(roomName, path, $scope.currentUser);
 
 		//handles the voting logic
 		$scope.vote = function(card) {
 			$scope.currentUser.vote = card;
-			socket.publish({eventType : events.VOTE, vote : card, name : $scope.currentUser.name});
+			room.vote(card, $scope.currentUser);
 		};
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.updateVoteVisibility = function (val) {
 			//only allow this if its the 'scrum' master
 			if($scope.isMaster) {
-				$scope.revealed = val;
-				socket.publish(
-				{
-					eventType : events.VOTE_VISIBILITY_TOGGLE, 
-					reveal : $scope.revealed 
-				});
+				room.updateVoteVisibility(val);
 			}
 		};
 		//handles the reset vote logic.
 		$scope.resetVotes = function () {
 			//only allow this if its the 'scrum' master
-			participants.resetVotes();
-			if($scope.isMaster) {
-				socket.publish({eventType : events.VOTE_RESET});
-			}
+			room.resetVotes();
 		};
-
-		//subscribe to messages: 
-		pubsub.subscribe(events.VOTE, function (message) {
-			$scope.$apply(function() {
-				participants.updateVote(
-					{
-						name : message.name,
-						vote : message.vote 
-					});
-				$scope.voteCounts = participants.voteCount();
-			});
-		});
-
-		pubsub.subscribe(events.USER_JOIN, function (message) {
-			$scope.$apply(function() {
-				participants.add({
-					name : message.name,
-					vote : message.vote
-				});
-			});
-		});
-
-		pubsub.subscribe(events.VOTE_VISIBILITY_TOGGLE, function (message) {
-			$scope.$apply(function (){
-				$scope.revealed = message.reveal;
-			});
-			
-		});
-
-		pubsub.subscribe(events.VOTE_RESET, function (message) {
-			$scope.$apply(function() {
-				participants.resetVotes();
-				$scope.updateVoteVisibility(false);
-				$scope.voteCounts = participants.voteCount();
-			});
-		});
-
-		pubsub.subscribe(events.ROOM_STATUS, function (message){
-			angular.forEach(message.room.participants, function (p) {
-				participants.add ({
-					name : p.name,
-					vote : p.vote
-				});
-			});
-			$scope.revealed = message.room.displayVotes;
-		});
 
 		//sets up the socket subscription.
 		var options = {
 			channel : $scope.channelId,
 			message : function (message) {
-				pubsub.publish(message.eventType, message);
+				$scope.$apply(function() {
+					pubsub.publish(message.eventType, message);
+				});
 			},
 			connect : function () {
 				socket.publish({ eventType : events.USER_JOIN, name : $scope.currentUser.name })
