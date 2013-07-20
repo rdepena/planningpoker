@@ -1,4 +1,7 @@
 (function (planningShark) {
+
+	"use strict"
+	
 	//we create our planning poker app
 	planningShark.app = angular.module('planningShark', ['planningShark.services']);
 
