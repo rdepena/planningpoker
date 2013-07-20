@@ -3,52 +3,8 @@
 'use strict';
  
 	planningShark.services = angular.module("planningShark.services", []);
-	
-	//register other services here...
-	
-	/* pubsub - based on https://github.com/phiggins42/bloody-jquery-plugins/blob/master/pubsub.js*/
-	planningShark.services.factory('pubsub', function ($rootScope) {
-		//we will return this object.
-		var my = {};
 
-		//I keep a copy of the events and their unsubscribe functions that are returned by the $on call.
-		var events = {};
-
-        //callback format is function (data). we can modify it later to accept function (event, data) if needed
-		my.subscribe = function (event, callback) {
-		    var unsubcribeFunction = $rootScope.$on(event, function (onEvent, data) { callback(data); });
-
-		    if (!events[event]) {
-		        events[event] = [];
-			}
-
-		    var eventObject =
-		    {
-		        callback: callback,
-		        unsubscribeFunction: unsubcribeFunction
-		    };
-
-		    events[event].push(eventObject);
-		};
-		
-		my.publish = function (event, data) {
-		    $rootScope.$broadcast(event, data);
-		};
-		
-		my.unsubscribe = function (event, callback) {
-		    var eventsArray = events[event];
-			angular.forEach(eventsArray, function (value, key) {
-				if(value.callback == callback) {
-				    value.unsubscribeFunction();
-				    eventsArray.splice(key, 1);
-				}
-			});
-		};
-
-		return my;
-	});
-
-	planningShark.services.factory('room', function (socket, events, cookies, pubsub){
+	planningShark.services.factory('room', function (socket, events, cookies){
 		var my = {};
 
 		my.participants = [];
@@ -56,7 +12,9 @@
 		my.voteCount = null;
 		my.roomName = null;
 
-		//private functions:
+		//private methods:
+
+		//check if participant exists.
 		var participantExists = function (name, onExists) {
 			var retparticipant;
 			angular.forEach(my.participants, function(p){
@@ -68,7 +26,73 @@
 				}
 			});
 			return retparticipant; 
-		}
+		};
+
+		//calculate vote counts.
+		var calcVoteCount = function () {
+			var vc = [];
+			angular.forEach(my.participants, function(u) {
+				//we check to see if this vote is alredy 
+				var vote = null;
+				angular.forEach(vc, function (v) {
+					if (v.vote == u.vote) {
+						vote = v;
+					}
+				});
+
+				//if a user already voted using this value add 1 to it.
+				if (vote != null) {
+					vote.count++;
+				}
+				//if its the first or only user voting for this number add it to the vote summary.
+				else {
+					vc.push({
+						vote : u.vote,
+						count : 1
+					});
+				}
+			});
+			return vc;
+		};
+
+		//private functions to react to socket events.
+		//we receive the message that a user voted
+		var onVote = function (message) {
+			my.addUpdateParticipant(
+				{
+					name : message.name,
+					vote : message.vote 
+				});
+			my.voteCount = calcVoteCount();
+		};
+		//we receive the message that a user joined.
+		var onUserJoin = function (message) {
+			my.addUpdateParticipant({
+				name : message.name,
+				vote : message.vote
+			});
+		};
+		//we receive the a message to change the visibility
+		var onUpdatedVisibility =  function (message) {
+			my.voteRevealed = message.reveal;
+			
+		};
+		//we receive the message that the votes have been reset
+		var onVoteReset = function (message) {
+			my.resetVotes();
+			my.voteRevealed = false;
+		};
+		//we receive the room status.
+		var onRoomStatus = function (message){
+			angular.forEach(message.room.participants, function (p) {
+				my.addUpdateParticipant ({
+					name : p.name,
+					vote : p.vote
+				});
+			});
+			my.voteRevealed = message.room.displayVotes;
+		};
+		//we either update or add a new user.
 		my.addUpdateParticipant = function (participant) {
 			var existingParticipant = participantExists(participant.name);
 			if(!existingParticipant) {
@@ -78,11 +102,10 @@
 		};
 
 		my.join = function (roomName, path, user) {
-			//save a cookie so we can display recent sessions
-
+			
 			//TODO: get this from somewhere else.
 			my.roomName = roomName;
-
+			//save a cookie so we can display recent sessions
 			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
 			my.addUpdateParticipant(user);
 			socket.publish({ eventType : events.USER_JOIN, name : user.name })
@@ -119,69 +142,6 @@
 
 		}
 
-		var calcVoteCount = function () {
-			var vc = [];
-			angular.forEach(my.participants, function(u) {
-				//we check to see if this vote is alredy 
-				var vote = null;
-				angular.forEach(vc, function (v) {
-					if (v.vote == u.vote) {
-						vote = v;
-					}
-				});
-
-				//if a user already voted using this value add 1 to it.
-				if (vote != null) {
-					vote.count++;
-				}
-				//if its the first or only user voting for this number add it to the vote summary.
-				else {
-					vc.push({
-						vote : u.vote,
-						count : 1
-					});
-				}
-			});
-			return vc;
-		};
-
-		//subscribe to messages: 
-		pubsub.subscribe(events.VOTE, function (message) {
-				my.addUpdateParticipant(
-					{
-						name : message.name,
-						vote : message.vote 
-					});
-				my.voteCount = calcVoteCount();
-		});
-
-		pubsub.subscribe(events.USER_JOIN, function (message) {
-				my.addUpdateParticipant({
-					name : message.name,
-					vote : message.vote
-				});
-		});
-
-		pubsub.subscribe(events.VOTE_VISIBILITY_TOGGLE, function (message) {
-				my.voteRevealed = message.reveal;
-			
-		});
-
-		pubsub.subscribe(events.VOTE_RESET, function (message) {
-				my.resetVotes();
-				my.voteRevealed = false;
-		});
-
-		pubsub.subscribe(events.ROOM_STATUS, function (message){
-			angular.forEach(message.room.participants, function (p) {
-				my.addUpdateParticipant ({
-					name : p.name,
-					vote : p.vote
-				});
-			});
-			my.voteRevealed = message.room.displayVotes;
-		});
-
 		my.setupRoom = function (roomName) {
 			
 			my.roomName = roomName;
@@ -193,7 +153,23 @@
 			var options = {
 				roomName : my.roomName,
 				message : function (message) {
-						pubsub.publish(message.eventType, message);
+					switch (message.eventType) {
+						case events.VOTE:
+							onVote(message);
+							break;
+						case events.USER_JOIN:
+							onUserJoin(message);
+							break;
+						case events.VOTE_VISIBILITY_TOGGLE:
+							onUpdatedVisibility(message);
+							break;
+						case events.VOTE_RESET:
+							onVoteReset(message);
+							break;
+						case events.ROOM_STATUS:
+							onRoomStatus(message);
+							break;
+					}
 				}
 			}
 			//we use socket to abstract any subscription policy.
@@ -239,7 +215,7 @@
 		//we will use rooms to isolate messages.
 		var room = '';
 
-		//init the connection.
+		//init the connectnection.
 		var socket = io.connect(window.location.hostname);	
 		my.subscribe = function (options) {
 			room = options.roomName;

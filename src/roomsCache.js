@@ -1,6 +1,8 @@
-//TODO: Figure out a way to dependency inject the events object.
-//TODO: Better naming.
+//This module's responsibility is to keep the rooms in memory.
 module.exports = function () {
+  
+  "use strict";
+
   var rooms = {};
   //add room to our cache
   var addRoom = function (roomName) {
@@ -26,6 +28,7 @@ module.exports = function () {
     return room;
   };
 
+  //set all votes to null.
   var resetVotes = function (roomName) {
     var room = getRoomByName (roomName);
     for(var p in room.participants) {
@@ -35,6 +38,7 @@ module.exports = function () {
     }
   };
 
+  //set the room vote visibility.
   var updateVoteVisibility = function (roomName, voteVisible) {
     getRoomByName(roomName).displayVotes = voteVisible;
   }

@@ -1,5 +1,7 @@
 (function (planningShark) {
 
+	"use strict";
+
 	//poker contains all the functionality related specifically with planning poker.
 	planningShark.poker =  {};
 
@@ -34,7 +36,7 @@
 
 	//roomCtrl is responsible for all and actions you can take while in a room.
 	planningShark.poker.roomCtrl = function ($scope, $http, $location, $routeParams, deck, room) {
-		//public members:
+		//set values for the view:
 		$scope.currentUser = { name : $routeParams.userName };
 		$scope.roomName = $routeParams.roomName;
 		$scope.isMaster = $routeParams.master === 'true';
@@ -46,15 +48,16 @@
 		$scope.users = room.participants;
 		room.join($scope.roomName, path, $scope.currentUser);
 
-		//scope functions:
+		//expose room logic: 
 
-		//expose the 
 		$scope.voteRevealed =  function () {
 			return room.voteRevealed;
 		};	
 		$scope.voteCounts = function () {
 			return room.voteCount;
 		}
+
+		//scope functions:
 
 		//handles the voting logic
 		$scope.vote = function(card) {
