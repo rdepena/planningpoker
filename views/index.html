@@ -31,11 +31,6 @@
             <span class="icon-bar"></span>
           </button>
           <a class="brand" href="#">planning poker</a>
-          <div class="nav-collapse collapse">
-            <ul class="nav">
-              <li class="active"><a href="#">start</a></li>
-            </ul>
-          </div>
         </div>
       </div>
     </div>  
@@ -103,14 +98,14 @@
                     <td >{{user.name}}</td> 
                     <td>
                       <!-- Different states that the participant can be in. !-->
-                      <span ng-show='revealed()'>{{user.vote}}</span>
-                      <span ng-show="(user.vote != null && !revealed())">voted</span>
+                      <span ng-show='voteRevealed()'>{{user.vote}}</span>
+                      <span ng-show="(user.vote != null && !voteRevealed())">voted</span>
                       <span ng-show="(user.vote == null)">joined</span>
                     </td>
                   </tr>
                 </tbody>
               </table>
-              <div ng-show='revealed() && voteCounts'>
+              <div ng-show='voteRevealed() && voteCounts()'>
                 <b>vote summary:</b>
                 <table class="table table-striped table-condensed table-bordered" style="width:40%">
                   <thead>
@@ -118,7 +113,7 @@
                     <th>vote</th>
                   </thead>
                   <tbody>
-                    <tr ng-repeat="voteCount in voteCounts | orderBy:'count':true" ng-show="voteCount.vote">
+                    <tr ng-repeat="voteCount in voteCounts() | orderBy:'count':true" ng-show="voteCount.vote">
                       <td>
                         <span >{{voteCount.count}}</span>
                       </td>
@@ -130,8 +125,8 @@
                 </table>
               </div>
               <div>
-                <button ng-show="(isMaster && !revealed())" class="btn btn-primary" ng-click='updateVoteVisibility(true)'>reveal</button>
-                <button ng-show="(isMaster && revealed())" class="btn btn-primary" ng-click='updateVoteVisibility(false)'>hide</button>
+                <button ng-show="(isMaster && !voteRevealed())" class="btn btn-primary" ng-click='updateVoteVisibility(true)'>reveal</button>
+                <button ng-show="(isMaster && voteRevealed())" class="btn btn-primary" ng-click='updateVoteVisibility(false)'>hide</button>
                 <button ng-show="isMaster" class="btn btn-inverse" ng-click='resetVotes()'>reset</button>
                 <p>
                   send this link so that others can <a target="_blank" href="#/join/{{roomName}}" >join the planning</a>

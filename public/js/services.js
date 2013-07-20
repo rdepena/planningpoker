@@ -52,7 +52,7 @@
 		var my = {};
 
 		my.participants = [];
-		my.revealed = false;
+		my.voteRevealed = false;
 		my.voteCount = null;
 		my.roomName = null;
 
@@ -105,7 +105,7 @@
 			});
 
 			//return parameter for chaining.
-			my.revealed = voteVisible;
+			my.voteRevealed = voteVisible;
 		};
 
 		my.resetVotes = function (sendNotification){
@@ -163,14 +163,13 @@
 		});
 
 		pubsub.subscribe(events.VOTE_VISIBILITY_TOGGLE, function (message) {
-				my.revealed = message.reveal;
+				my.voteRevealed = message.reveal;
 			
 		});
 
 		pubsub.subscribe(events.VOTE_RESET, function (message) {
-				console.log("I am here");
 				my.resetVotes();
-				my.revealed = false;
+				my.voteRevealed = false;
 		});
 
 		pubsub.subscribe(events.ROOM_STATUS, function (message){
@@ -180,14 +179,14 @@
 					vote : p.vote
 				});
 			});
-			my.revealed = message.room.displayVotes;
+			my.voteRevealed = message.room.displayVotes;
 		});
 
 		my.setupRoom = function (roomName) {
 			
 			my.roomName = roomName;
 			my.participants = [];
-			my.revealed = false;
+			my.voteRevealed = false;
 			my.voteCount = null;
 
 			//sets up the socket subscription.
@@ -241,7 +240,7 @@
 		var room = '';
 
 		//init the connection.
-		var socket = io.connect(window.location.hostname);
+		var socket = io.connect(window.location.hostname);	
 		my.subscribe = function (options) {
 			room = options.roomName;
 			socket.on('event', function(data) {

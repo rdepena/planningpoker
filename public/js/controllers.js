@@ -13,6 +13,7 @@
 			$location.path(path);
 		};
 
+		//deletes the session cookie.
 		$scope.delete = function (cookie) {
 			console.log(cookie);
 			cookies.remove(cookie.name);
@@ -39,17 +40,21 @@
 		$scope.roomName = $routeParams.roomName;
 		$scope.isMaster = $routeParams.master === 'true';
 		$scope.deck = deck;
+		var path = '/room/' + $scope.roomName + '/' + $scope.currentUser.name;
 
 		//join the room:
 		room.setupRoom($scope.roomName);
 		$scope.users = room.participants;
-		var path = '/room/' + $scope.roomName + '/' + $scope.currentUser.name;
 		room.join($scope.roomName, path, $scope.currentUser);
 
 		//scope functions:
 
-		$scope.revealed =  function () {
-			return room.revealed;
+		//expose the 
+		$scope.voteRevealed =  function () {
+			return room.voteRevealed;
+		};	
+		$scope.voteCounts = function () {
+			return room.voteCount;
 		}
 
 		//handles the voting logic
