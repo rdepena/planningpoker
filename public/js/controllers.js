@@ -15,7 +15,6 @@
 
 		//deletes the session cookie.
 		$scope.delete = function (cookie) {
-			console.log(cookie);
 			cookies.remove(cookie.name);
 			$scope.openSessions = cookies.get();
 		}
