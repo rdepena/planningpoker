@@ -242,7 +242,6 @@
 
 		//init the connection.
 		var socket = io.connect(window.location.hostname);
-
 		my.subscribe = function (options) {
 			room = options.roomName;
 			socket.on('event', function(data) {
@@ -252,11 +251,8 @@
 					});
 				}
 			});
-			socket.on('connect', function (){
-				console.log("connected");
-				console.log(options.roomName);
-				socket.emit('joinRoom', { room : room });
-			});
+			
+			socket.emit('joinRoom', { room : room });
 		};
 
 		my.publish = function (msg) {
