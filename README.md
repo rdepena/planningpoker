@@ -1,4 +1,4 @@
-node/angular/socket.io planning poker app
+node/angular/socket.io planning poker
 =============
 
 Planning poker app built using AngularJS/Node.js/Socket.io
@@ -11,7 +11,7 @@ read full entry: https://en.wikipedia.org/wiki/Planning_poker
 
 The MIT License (MIT)
 
-Copyright (c) [2013] [Ricardo de Peña]
+Copyright (c) 2013 Ricardo de Peña
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
