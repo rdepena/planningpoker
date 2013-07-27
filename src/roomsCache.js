@@ -10,7 +10,7 @@ module.exports = function () {
   var addRoom = function (roomName) {
     //initialize room:
     var room = rooms[roomName] = {};
-    room.participants = {};
+    room.users = {};
     room.displayVotes = false;
     return room;
   };
@@ -18,7 +18,7 @@ module.exports = function () {
   //adds or updates the user within a room.
   my.addUpdateUser = function (roomName, user) {
     // the user object with the same name will be replaced, TODO: in the future add some checking os that wach user has a hash to identify each unique one.
-    return my.getRoomByName(roomName).participants[user.name] = user;
+    return my.getRoomByName(roomName).users[user.name] = user;
   };
 
   //returns the room by the given name
@@ -33,9 +33,9 @@ module.exports = function () {
   //set all votes to null.
   my.resetVotes = function (roomName) {
     var room = my.getRoomByName (roomName);
-    for(var p in room.participants) {
-      if(room.participants.hasOwnProperty(p)) {
-        room.participants[p].vote = null;
+    for(var p in room.users) {
+      if(room.users.hasOwnProperty(p)) {
+        room.users[p].vote = null;
       }
     }
   };

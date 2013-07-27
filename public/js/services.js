@@ -42,7 +42,7 @@
 		//private functions to react to socket events.
 		//we receive the message that a user voted
 		var onVote = function (message) {
-			my.addUpdateParticipant(
+			my.addUpdateUser(
 				{
 					name : message.name,
 					vote : message.vote
@@ -52,7 +52,7 @@
 		};
 		//we receive the message that a user joined.
 		var onUserJoin = function (message) {
-			my.addUpdateParticipant({
+			my.addUpdateUser({
 				name : message.name,
 				vote : message.vote
 			});
@@ -69,7 +69,7 @@
 		//we receive the room status.
 		var onRoomStatus = function (message) {
 			angular.forEach(message.room.users, function (p) {
-				my.addUpdateParticipant({
+				my.addUpdateUser({
 					name : p.name,
 					vote : p.vote
 				});
@@ -77,14 +77,17 @@
 			my.voteRevealed = message.room.displayVotes;
 		};
 		//we either update or add a new user.
-		my.addUpdateParticipant = function (user) {
+		my.addUpdateUser = function (user) {
+			var exists = false;
 			angular.forEach(my.users, function (u) {
 				if (u.name === user.name) {
 					u.vote = user.vote;
-					return;
+					exists = true;
 				}
 			});
-			my.users.push(user);
+			if(!exists) {
+				my.users.push(user);
+			}
 		};
 
 		my.join = function (roomName, path, user) {
@@ -92,7 +95,7 @@
 			my.roomName = roomName;
 			//save a cookie so we can display recent sessions
 			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
-			my.addUpdateParticipant(user);
+			my.addUpdateUser(user);
 			socket.publish({ eventType : events.USER_JOIN, name : user.name });
 		};
 
