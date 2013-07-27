@@ -1,51 +1,35 @@
 (function (planningShark) {
 
-'use strict';
- 
+	'use strict';
+
 	planningShark.services = angular.module("planningShark.services", []);
 
-	planningShark.services.factory('room', function (socket, events, cookies){
+	planningShark.services.factory('room', function (socket, events, cookies) {
 		var my = {};
 
-		my.participants = [];
+		my.users = [];
 		my.voteRevealed = false;
 		my.voteCount = null;
 		my.roomName = null;
 
 		//private methods:
 
-		//check if participant exists.
-		var participantExists = function (name, onExists) {
-			var retparticipant;
-			angular.forEach(my.participants, function(p){
-				if(p.name === name) {
-					retparticipant = p;
-					if(angular.isFunction(onExists)) {
-						onExists(p);	
-					}
-				}
-			});
-			return retparticipant; 
-		};
-
 		//calculate vote counts.
 		var calcVoteCount = function () {
 			var vc = [];
-			angular.forEach(my.participants, function(u) {
+			angular.forEach(my.users, function (u) {
 				//we check to see if this vote is alredy 
 				var vote = null;
 				angular.forEach(vc, function (v) {
-					if (v.vote == u.vote) {
+					if (v.vote === u.vote) {
 						vote = v;
 					}
 				});
 
 				//if a user already voted using this value add 1 to it.
-				if (vote != null) {
-					vote.count++;
-				}
-				//if its the first or only user voting for this number add it to the vote summary.
-				else {
+				if (vote !== null) {
+					vote.count += 1;
+				} else {
 					vc.push({
 						vote : u.vote,
 						count : 1
@@ -61,8 +45,9 @@
 			my.addUpdateParticipant(
 				{
 					name : message.name,
-					vote : message.vote 
-				});
+					vote : message.vote
+				}
+			);
 			my.voteCount = calcVoteCount();
 		};
 		//we receive the message that a user joined.
@@ -75,7 +60,6 @@
 		//we receive the a message to change the visibility
 		var onUpdatedVisibility =  function (message) {
 			my.voteRevealed = message.reveal;
-			
 		};
 		//we receive the message that the votes have been reset
 		var onVoteReset = function (message) {
@@ -83,9 +67,9 @@
 			my.voteRevealed = false;
 		};
 		//we receive the room status.
-		var onRoomStatus = function (message){
-			angular.forEach(message.room.participants, function (p) {
-				my.addUpdateParticipant ({
+		var onRoomStatus = function (message) {
+			angular.forEach(message.room.users, function (p) {
+				my.addUpdateParticipant({
 					name : p.name,
 					vote : p.vote
 				});
@@ -93,22 +77,23 @@
 			my.voteRevealed = message.room.displayVotes;
 		};
 		//we either update or add a new user.
-		my.addUpdateParticipant = function (participant) {
-			var existingParticipant = participantExists(participant.name);
-			if(!existingParticipant) {
-				my.participants.push(participant);
-			}
-			else existingParticipant.vote = participant.vote;;
+		my.addUpdateParticipant = function (user) {
+			angular.forEach(my.users, function (u) {
+				if (u.name === user.name) {
+					u.vote = user.vote;
+					return;
+				}
+			});
+			my.users.push(user);
 		};
 
 		my.join = function (roomName, path, user) {
-			
 			//TODO: get this from somewhere else.
 			my.roomName = roomName;
 			//save a cookie so we can display recent sessions
 			cookies.add(roomName, { name : roomName, path: path, joinDate : Date.now()}, {expires : 1});
 			my.addUpdateParticipant(user);
-			socket.publish({ eventType : events.USER_JOIN, name : user.name })
+			socket.publish({ eventType : events.USER_JOIN, name : user.name });
 		};
 
 		my.vote = function (card, user) {
@@ -122,21 +107,22 @@
 
 			//send update over the wire.
 			socket.publish(
-			{
-				eventType : events.VOTE_VISIBILITY_TOGGLE, 
-				reveal : voteVisible
-			});
+				{
+					eventType : events.VOTE_VISIBILITY_TOGGLE,
+					reveal : voteVisible
+				}
+			);
 
 			//return parameter for chaining.
 			my.voteRevealed = voteVisible;
 		};
 
-		my.resetVotes = function (sendNotification){
-			angular.forEach(my.participants, function (p){
+		my.resetVotes = function (sendNotification) {
+			angular.forEach(my.users, function (p) {
 				p.vote = null;
 			});
 			my.voteCount = null;
-			if(sendNotification) {
+			if (sendNotification) {
 				socket.publish({eventType : events.VOTE_RESET});
 			}
 
@@ -145,7 +131,7 @@
 		my.setupRoom = function (roomName) {
 			
 			my.roomName = roomName;
-			my.participants = [];
+			my.users = [];
 			my.voteRevealed = false;
 			my.voteCount = null;
 
@@ -180,7 +166,7 @@
 
 	});
 
-	planningShark.services.factory('cookies', function(){
+	planningShark.services.factory('cookies', function () {
 		var my = {};
 		$.cookie.json = true;
 
@@ -192,9 +178,9 @@
 			var cookiesArray = [],
 				currentCookies = $.cookie(name);
 			for (var c in currentCookies) {
-				if(currentCookies.hasOwnProperty(c)) {
+				if (currentCookies.hasOwnProperty(c)) {
 					//make sure the cookie has a path value.
-					if(currentCookies[c] && currentCookies[c].path) {
+					if (currentCookies[c] && currentCookies[c].path) {
 						cookiesArray.push(currentCookies[c]);	
 					}
 				}
@@ -209,7 +195,7 @@
 		return my;
 	});
 	
-	planningShark.services.factory('socket', function($rootScope){
+	planningShark.services.factory('socket', function ($rootScope) {
 		var my = {};
 
 		//we will use rooms to isolate messages.
@@ -220,7 +206,7 @@
 		my.subscribe = function (options) {
 			room = options.roomName;
 			socket.on('event', function(data) {
-				if(angular.isFunction(options.message)) {
+				if (angular.isFunction(options.message)) {
 					$rootScope.$apply(function () {
 					options.message(data.message);
 					});
