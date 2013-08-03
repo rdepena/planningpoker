@@ -65,7 +65,7 @@
 		};
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.updateVoteVisibility = function (val) {
-			room.updateVoteVisibility(val);
+			room.updateVoteVisibility(val, true);
 		};
 		//handles the reset vote logic.
 		$scope.resetVotes = function () {

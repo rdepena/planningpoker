@@ -14,31 +14,6 @@
 
 		//private methods:
 
-		//calculate vote counts.
-		var calcVoteCount = function () {
-			var vc = [];
-			angular.forEach(my.users, function (u) {
-				//we check to see if this vote is alredy 
-				var vote = null;
-				angular.forEach(vc, function (v) {
-					if (v.vote === u.vote) {
-						vote = v;
-					}
-				});
-
-				//if a user already voted using this value add 1 to it.
-				if (vote !== null) {
-					vote.count += 1;
-				} else {
-					vc.push({
-						vote : u.vote,
-						count : 1
-					});
-				}
-			});
-			return vc;
-		};
-
 		//private functions to react to socket events.
 		//we receive the message that a user voted
 		var onVote = function (message) {
@@ -48,7 +23,7 @@
 					vote : message.vote
 				}
 			);
-			my.voteCount = calcVoteCount();
+			my.calcVoteCount();
 		};
 		//we receive the message that a user joined.
 		var onUserJoin = function (message) {
@@ -64,7 +39,6 @@
 		//we receive the message that the votes have been reset
 		var onVoteReset = function (message) {
 			my.resetVotes();
-			my.voteRevealed = false;
 		};
 		//we receive the room status.
 		var onRoomStatus = function (message) {
@@ -106,8 +80,15 @@
 			socket.publish({eventType : events.VOTE, vote : card, name : user.name});
 		};
 
-		my.updateVoteVisibility = function (voteVisible) {
+		my.updateVoteVisibility = function (voteVisible, sendNotification) {
 
+			//return parameter for chaining.
+			my.voteRevealed = voteVisible;
+
+			//if we are not suposed to send a notification dont.
+			if (!sendNotification) {
+				return;
+			}
 			//send update over the wire.
 			socket.publish(
 				{
@@ -116,8 +97,6 @@
 				}
 			);
 
-			//return parameter for chaining.
-			my.voteRevealed = voteVisible;
 		};
 
 		my.resetVotes = function (sendNotification) {
@@ -125,6 +104,7 @@
 				p.vote = null;
 			});
 			my.voteCount = null;
+			my.updateVoteVisibility(false, false);
 			if (sendNotification) {
 				socket.publish({eventType : events.VOTE_RESET});
 			}
@@ -163,6 +143,31 @@
 			}
 			//we use socket to abstract any subscription policy.
 			socket.subscribe(options);
+		};
+
+		//calculate vote counts.
+		my.calcVoteCount = function () {
+			var vc = [];
+			angular.forEach(my.users, function (u) {
+				//we check to see if this vote is alredy 
+				var vote = null;
+				angular.forEach(vc, function (v) {
+					if (v.vote === u.vote) {
+						vote = v;
+					}
+				});
+
+				//if a user already voted using this value add 1 to it.
+				if (vote !== null) {
+					vote.count += 1;
+				} else {
+					vc.push({
+						vote : u.vote,
+						count : 1
+					});
+				}
+			});
+			my.voteCount = vc;
 		};
 
 		return my;
