@@ -23,7 +23,7 @@
 					vote : message.vote
 				}
 			);
-			my.calcVoteCount();
+				my.calcVoteCount();
 		};
 		//we receive the message that a user joined.
 		var onUserJoin = function (message) {
@@ -210,10 +210,10 @@
 		var room = '';
 
 		//init the connectnection.
-		var socket = io.connect(window.location.hostname);	
+		var rtms = io.connect(window.location.hostname);	
 		my.subscribe = function (options) {
 			room = options.roomName;
-			socket.on('event', function(data) {
+			rtms.on('event', function(data) {
 				if (angular.isFunction(options.message)) {
 					$rootScope.$apply(function () {
 					options.message(data.message);
@@ -221,11 +221,11 @@
 				}
 			});
 			
-			socket.emit('joinRoom', { room : room });
+			rtms.emit('joinRoom', { room : room });
 		};
 
 		my.publish = function (msg) {
-			socket.emit('broadcast', 
+			rtms.emit('broadcast', 
 			{
 				room : room,
 				message : msg
