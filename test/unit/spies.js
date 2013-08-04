@@ -3,19 +3,12 @@
 
 'use strict';
 //set up fakes for SocketIO
+var rtms = jasmine.createSpyObj('rtms', ['on', 'emit']);
 var io = jasmine.createSpyObj('io', ['connect']);
 io.connect.andCallFake(function () {
-    return {
-		on : function () { return null; },
-		emit : function () { return null; }
-    };
+    //socket IO's connect function will return our spy object.
+    return rtms;
 });
 
 //set up fakes for Jquery Cookie plugin.
 var $ = jasmine.createSpyObj('$', ["cookie", 'removeCookie']);
-$.cookie.andCallFake(function () {
-	return null;
-});
-$.removeCookie.andCallFake(function () {
-	return null;
-});

@@ -5,15 +5,6 @@
 'use strict';
 // Jasmine spec for the cookies service.
 
-//set up fakes for Jquery Cookie plugin.
-var $ = jasmine.createSpyObj('$', ["cookie", 'removeCookie']);
-$.cookie.andCallFake(function () {
-	return null;
-});
-$.removeCookie.andCallFake(function () {
-	return null;
-});
-
 //we test the cookie service..
 describe('cookies spec:', function () {
 	beforeEach(function () {
