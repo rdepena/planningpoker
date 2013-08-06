@@ -13,8 +13,7 @@ files = [
   "public/vendor/angular.min.js",
   "test/lib/angular/angular-mocks.js",
   "public/js/*.js",
-  "test/unit/spies.js",
-  "test/unit/specs/*.js"
+  "test/unit/*.js"
 ];
 
 // enable / disable watching file and executing tests whenever any file changes
