@@ -5,11 +5,11 @@
 // base path, that will be used to resolve files and exclude
 basePath = '../';
 
+    // frameworks to use
+ frameworks: ['jasmine'];
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
   "public/vendor/angular.min.js",
   "test/lib/angular/angular-mocks.js",
   "public/js/*.js",
