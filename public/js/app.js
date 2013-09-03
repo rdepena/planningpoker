@@ -1,5 +1,7 @@
-(function (planningShark) {
+/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global planningShark, angular*/
 
+(function (planningShark) {
 	"use strict";
 
 	//we create our planning poker app

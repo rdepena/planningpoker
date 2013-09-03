@@ -1,11 +1,10 @@
 /*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
 /*global jasmine, describe, beforeEach, it, inject, expect, angular*/
 
-'use strict';
 //we test the room.
 var io;
 describe('room spec:', function () {
-
+	'use strict';
 	//variables we will use for this test.
 	var user = {};
 

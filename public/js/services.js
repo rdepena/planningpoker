@@ -1,5 +1,7 @@
-(function (planningShark) {
+/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
 
+(function (planningShark) {
 	'use strict';
 
 	planningShark.services = angular.module("planningShark.services", []);
@@ -23,7 +25,7 @@
 					vote : message.vote
 				}
 			);
-				my.calcVoteCount();
+			my.calcVoteCount();
 		};
 		//we receive the message that a user joined.
 		var onUserJoin = function (message) {
@@ -109,7 +111,7 @@
 				socket.publish({eventType : events.VOTE_RESET});
 			}
 
-		}
+		};
 
 		my.setupRoom = function (roomName) {
 			
@@ -123,24 +125,24 @@
 				roomName : my.roomName,
 				message : function (message) {
 					switch (message.eventType) {
-						case events.VOTE:
-							onVote(message);
-							break;
-						case events.USER_JOIN:
-							onUserJoin(message);
-							break;
-						case events.VOTE_VISIBILITY_TOGGLE:
-							onUpdatedVisibility(message);
-							break;
-						case events.VOTE_RESET:
-							onVoteReset(message);
-							break;
-						case events.ROOM_STATUS:
-							onRoomStatus(message);
-							break;
+					case events.VOTE:
+						onVote(message);
+						break;
+					case events.USER_JOIN:
+						onUserJoin(message);
+						break;
+					case events.VOTE_VISIBILITY_TOGGLE:
+						onUpdatedVisibility(message);
+						break;
+					case events.VOTE_RESET:
+						onVoteReset(message);
+						break;
+					case events.ROOM_STATUS:
+						onRoomStatus(message);
+						break;
 					}
 				}
-			}
+			};
 			//we use socket to abstract any subscription policy.
 			socket.subscribe(options);
 		};
@@ -198,7 +200,7 @@
 
 		my.remove = function (name) {
 			$.removeCookie(name);
-		}
+		};
 
 		return my;
 	});
@@ -216,7 +218,7 @@
 			rtms.on('event', function(data) {
 				if (angular.isFunction(options.message)) {
 					$rootScope.$apply(function () {
-					options.message(data.message);
+						options.message(data.message);
 					});
 				}
 			});

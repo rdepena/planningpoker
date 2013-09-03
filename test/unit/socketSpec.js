@@ -1,10 +1,12 @@
 /*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
 /*global jasmine, describe, beforeEach, it, inject, expect, rtms, angular, spyOn*/
 
-'use strict';
+
 // Jasmine spec for the socket service.
 var io;
 describe('socket spec', function () {
+	'use strict';
+	
 	var rtms;
 	beforeEach(function () {
 		//set up the module.

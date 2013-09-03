@@ -1,5 +1,7 @@
-(function (planningShark) {
+/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
 
+(function (planningShark) {
 	"use strict";
 
 	//poker contains all the functionality related specifically with planning poker.
