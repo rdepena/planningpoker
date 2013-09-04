@@ -4,17 +4,15 @@
 (function (planningShark) {
 	'use strict';
 
-	planningShark.services = angular.module("planningShark.services", []);
+	planningShark.services = planningShark.services || angular.module("planningShark.services", []);
 
 	planningShark.services.factory('room', function (socket, events, cookies) {
-		var my = {};
 
+		var my = {};
 		my.users = [];
 		my.voteRevealed = false;
 		my.voteCount = null;
 		my.roomName = null;
-
-		//private methods:
 
 		//private functions to react to socket events.
 		//we receive the message that a user voted
@@ -175,68 +173,6 @@
 		return my;
 
 	});
-
-	planningShark.services.factory('cookies', function () {
-		var my = {};
-		$.cookie.json = true;
-
-		my.add = function (name, value, options) {
-			$.cookie(name, value, options);
-		};
-
-		my.get = function (name) {
-			var cookiesArray = [],
-				currentCookies = $.cookie(name);
-			for (var c in currentCookies) {
-				if (currentCookies.hasOwnProperty(c)) {
-					//make sure the cookie has a path value.
-					if (currentCookies[c] && currentCookies[c].path) {
-						cookiesArray.push(currentCookies[c]);	
-					}
-				}
-			}
-			return cookiesArray;
-		};
-
-		my.remove = function (name) {
-			$.removeCookie(name);
-		};
-
-		return my;
-	});
-	
-	planningShark.services.factory('socket', function ($rootScope) {
-		var my = {};
-
-		//we will use rooms to isolate messages.
-		var room = '';
-
-		//init the connectnection.
-		var rtms = io.connect(window.location.hostname);	
-		my.subscribe = function (options) {
-			room = options.roomName;
-			rtms.on('event', function(data) {
-				if (angular.isFunction(options.message)) {
-					$rootScope.$apply(function () {
-						options.message(data.message);
-					});
-				}
-			});
-			
-			rtms.emit('joinRoom', { room : room });
-		};
-
-		my.publish = function (msg) {
-			rtms.emit('broadcast', 
-			{
-				room : room,
-				message : msg
-			});
-		};
-
-		return my;
-	});
-
 
 	return planningShark.services;
 

@@ -1,5 +1,7 @@
-(function (planningShark) {
+/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global planningShark, angular*/
 
+(function (planningShark) {
 	"use strict";
 
 	//we create our planning poker app
@@ -28,8 +30,10 @@
 	//card deck.
 	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee']);
 
-})(this.planningShark = this.planningShark || {});;(function (planningShark) {
+})(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
 
+(function (planningShark) {
 	"use strict";
 
 	//poker contains all the functionality related specifically with planning poker.
@@ -104,21 +108,59 @@
 		};
 	};
 
-})(this.planningShark = this.planningShark || {});;(function (planningShark) {
+})(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
 
+(function (planningShark) {
 	'use strict';
 
-	planningShark.services = angular.module("planningShark.services", []);
+	planningShark.services = planningShark.services || angular.module("planningShark.services", []);
+
+	planningShark.services.factory('cookies', function () {
+		var my = {};
+		$.cookie.json = true;
+
+		my.add = function (name, value, options) {
+			$.cookie(name, value, options);
+		};
+
+		my.get = function (name) {
+			var cookiesArray = [],
+				currentCookies = $.cookie(name);
+			for (var c in currentCookies) {
+				if (currentCookies.hasOwnProperty(c)) {
+					//make sure the cookie has a path value.
+					if (currentCookies[c] && currentCookies[c].path) {
+						cookiesArray.push(currentCookies[c]);	
+					}
+				}
+			}
+			return cookiesArray;
+		};
+
+		my.remove = function (name) {
+			$.removeCookie(name);
+		};
+
+		return my;
+	});
+
+	return planningShark.services;
+})(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
+
+(function (planningShark) {
+	'use strict';
+
+	planningShark.services = planningShark.services || angular.module("planningShark.services", []);
 
 	planningShark.services.factory('room', function (socket, events, cookies) {
-		var my = {};
 
+		var my = {};
 		my.users = [];
 		my.voteRevealed = false;
 		my.voteCount = null;
 		my.roomName = null;
-
-		//private methods:
 
 		//private functions to react to socket events.
 		//we receive the message that a user voted
@@ -129,7 +171,7 @@
 					vote : message.vote
 				}
 			);
-				my.calcVoteCount();
+			my.calcVoteCount();
 		};
 		//we receive the message that a user joined.
 		var onUserJoin = function (message) {
@@ -215,7 +257,7 @@
 				socket.publish({eventType : events.VOTE_RESET});
 			}
 
-		}
+		};
 
 		my.setupRoom = function (roomName) {
 			
@@ -229,24 +271,24 @@
 				roomName : my.roomName,
 				message : function (message) {
 					switch (message.eventType) {
-						case events.VOTE:
-							onVote(message);
-							break;
-						case events.USER_JOIN:
-							onUserJoin(message);
-							break;
-						case events.VOTE_VISIBILITY_TOGGLE:
-							onUpdatedVisibility(message);
-							break;
-						case events.VOTE_RESET:
-							onVoteReset(message);
-							break;
-						case events.ROOM_STATUS:
-							onRoomStatus(message);
-							break;
+					case events.VOTE:
+						onVote(message);
+						break;
+					case events.USER_JOIN:
+						onUserJoin(message);
+						break;
+					case events.VOTE_VISIBILITY_TOGGLE:
+						onUpdatedVisibility(message);
+						break;
+					case events.VOTE_RESET:
+						onVoteReset(message);
+						break;
+					case events.ROOM_STATUS:
+						onRoomStatus(message);
+						break;
 					}
 				}
-			}
+			};
 			//we use socket to abstract any subscription policy.
 			socket.subscribe(options);
 		};
@@ -280,35 +322,15 @@
 
 	});
 
-	planningShark.services.factory('cookies', function () {
-		var my = {};
-		$.cookie.json = true;
+	return planningShark.services;
 
-		my.add = function (name, value, options) {
-			$.cookie(name, value, options);
-		};
+})(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
 
-		my.get = function (name) {
-			var cookiesArray = [],
-				currentCookies = $.cookie(name);
-			for (var c in currentCookies) {
-				if (currentCookies.hasOwnProperty(c)) {
-					//make sure the cookie has a path value.
-					if (currentCookies[c] && currentCookies[c].path) {
-						cookiesArray.push(currentCookies[c]);	
-					}
-				}
-			}
-			return cookiesArray;
-		};
+(function (planningShark) {
+	'use strict';
+	planningShark.services = planningShark.services || angular.module("planningShark.services", []);
 
-		my.remove = function (name) {
-			$.removeCookie(name);
-		}
-
-		return my;
-	});
-	
 	planningShark.services.factory('socket', function ($rootScope) {
 		var my = {};
 
@@ -322,7 +344,7 @@
 			rtms.on('event', function(data) {
 				if (angular.isFunction(options.message)) {
 					$rootScope.$apply(function () {
-					options.message(data.message);
+						options.message(data.message);
 					});
 				}
 			});
@@ -340,7 +362,6 @@
 
 		return my;
 	});
-
 
 	return planningShark.services;
 

@@ -7,7 +7,7 @@ module.exports = function(grunt) {
 			},
 			dist : {
 				src : ['public/js/*.js'],
-				dest: 'public/js/dist/<%= pkg.name %>.js'
+				dest: 'public/js/dist/planningshark.js'
 			}
 		},
 		karma: {
@@ -32,7 +32,8 @@ module.exports = function(grunt) {
 					module: true
 				}
 			}
-		}
+		},
+
 	});
 
 	grunt.loadNpmTasks('grunt-karma');
@@ -40,6 +41,6 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('test', ['jshint']);
-	grunt.registerTask('default', ['jshint', 'karma', 'concat']);
+	grunt.registerTask('test', ['jshint', 'karma']);
+	grunt.registerTask('default', ['jshint', 'concat']);
 };
