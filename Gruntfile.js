@@ -22,7 +22,7 @@ module.exports = function(grunt) {
 		},
 		jshint: {
 			// define the files to lint
-			files: ['gruntfile.js', 'test/unit/*.js', 'public/js/*.js'],
+			files: ['gruntfile.js', 'test/unit/*.js', 'public/js/*.js', 'server.js', 'src/*.js'],
 			// configure JSHint (documented at http://www.jshint.com/docs/)
 			options: {
 				// more options here if you want to override JSHint defaults
@@ -42,5 +42,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
 	grunt.registerTask('test', ['jshint', 'karma']);
-	grunt.registerTask('default', ['jshint', 'concat']);
+	grunt.registerTask('default', ['jshint', 'karma', 'concat']);
 };
