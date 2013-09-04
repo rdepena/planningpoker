@@ -1,6 +1,8 @@
+/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
+/*global */
 
 (function () {
-'use strict';
+    'use strict';
 
     var http = require('http'),
         express = require('express'),

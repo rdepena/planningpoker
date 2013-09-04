@@ -1,5 +1,5 @@
 /*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
-/*global jasmine, describe, beforeEach, it, inject, planningShark, expect, rtms, angular, spyOn*/
+/*global */
 
 (function (planningShark) {
 	"use strict";
