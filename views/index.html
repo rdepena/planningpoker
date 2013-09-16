@@ -1,7 +1,7 @@
 <!DOCTYPE html> 
 <html>
   <head>
-    <title>planning poker</title>
+    <title>Planning Shark</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Bootstrap -->
     <link href="css/bootstrap-combined.min.css" rel="stylesheet" media="screen">
@@ -27,7 +27,7 @@
             <span class="icon-bar"></span>
             <span class="icon-bar"></span>
           </button>
-          <a class="brand" href="#">planning poker</a>
+          <a class="brand" href="#">Planning Shark</a>
         </div>
       </div>
     </div>  
@@ -95,7 +95,7 @@
                     <td >{{user.name}}</td> 
                     <td>
                       <!-- Different states that the participant can be in. !-->
-                      <span ng-show='voteRevealed()'>{{user.vote}}</span>
+                      <span ng-show='voteRevealed()' class="btn">{{user.vote}}</span>
                       <span ng-show="(user.vote != null && !voteRevealed())">voted</span>
                       <span ng-show="(user.vote == null)">joined</span>
                     </td>
@@ -112,10 +112,10 @@
                   <tbody>
                     <tr ng-repeat="voteCount in voteCounts() | orderBy:'count':true" ng-show="voteCount.vote">
                       <td>
-                        <span >{{voteCount.count}}</span>
+                        <span>{{voteCount.count}}</span>
                       </td>
                       <td>
-                        <span>{{voteCount.vote}}<span>
+                        <span class="btn">{{voteCount.vote}}<span>
                       </td>
                     </tr>
                   </tbody>
