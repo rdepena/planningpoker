@@ -95,7 +95,7 @@
                     <td >{{user.name}}</td> 
                     <td>
                       <!-- Different states that the participant can be in. !-->
-                      <span ng-show='voteRevealed()' class="btn">{{user.vote}}</span>
+                      <span ng-show='voteRevealed()'>{{user.vote}}</span>
                       <span ng-show="(user.vote != null && !voteRevealed())">voted</span>
                       <span ng-show="(user.vote == null)">joined</span>
                     </td>
@@ -115,7 +115,7 @@
                         <span>{{voteCount.count}}</span>
                       </td>
                       <td>
-                        <span class="btn">{{voteCount.vote}}<span>
+                        <span >{{voteCount.vote}}<span>
                       </td>
                     </tr>
                   </tbody>
