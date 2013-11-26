@@ -8,6 +8,10 @@ Q: What is planning poker ?
 A: from wikipedia: "Planning poker, also called Scrum poker, is a consensus-based technique for estimating, mostly used to estimate effort or relative size of user stories in software development. It is a variation of the Wideband Delphi method. It is most commonly used in agile software development, in particular the Extreme Programming methodology."
 read full entry: https://en.wikipedia.org/wiki/Planning_poker
 
+Contributing ? 
+
+Make sure you use grunt to lint concat and run all unit tests as you are making changes, npm install should leave your environment ready to go. 
+
 
 The MIT License (MIT)
 
