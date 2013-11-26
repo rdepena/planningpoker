@@ -18,7 +18,7 @@
 			rtms.on('event', function(data) {
 				if (angular.isFunction(options.message)) {
 					$rootScope.$apply(function () {
-						options.message(data.payload);
+						options.message(data.message);
 					});
 				}
 			});

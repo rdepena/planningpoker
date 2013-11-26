@@ -12,7 +12,7 @@ basePath = '../';
 files = [
   "public/vendor/angular.min.js",
   "test/lib/angular/angular-mocks.js",
-  "public/js/*.js",
+  "public/js/src/*.js",
   "test/unit/*.js"
 ];
 

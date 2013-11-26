@@ -6,7 +6,7 @@ module.exports = function(grunt) {
 				separator : ";"
 			},
 			dist : {
-				src : ['public/js/*.js'],
+				src : ['public/js/src/*.js'],
 				dest: 'public/js/dist/planningshark.js'
 			}
 		},
@@ -17,12 +17,12 @@ module.exports = function(grunt) {
 			}
 		},
 		watch: {
-			files: ['public/js/*.js'],
-			tasks: ['jshint', 'karma']
+			files: ['public/js/src/*.js'],
+			tasks: ['jshint', 'karma', 'concat']
 		},
 		jshint: {
 			// define the files to lint
-			files: ['gruntfile.js', 'test/unit/*.js', 'public/js/*.js', 'server.js', 'src/*.js'],
+			files: ['gruntfile.js', 'test/unit/*.js', 'public/js/src/*.js', 'server.js', 'src/*.js'],
 			// configure JSHint (documented at http://www.jshint.com/docs/)
 			options: {
 				// more options here if you want to override JSHint defaults
@@ -41,6 +41,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('test', ['jshint', 'karma']);
 	grunt.registerTask('default', ['jshint', 'karma', 'concat']);
 };
