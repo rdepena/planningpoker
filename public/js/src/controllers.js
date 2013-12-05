@@ -65,6 +65,11 @@
 			$scope.currentUser.vote = card;
 			room.vote(card, $scope.currentUser);
 		};
+
+		$scope.kick = function(user) {
+			room.kick(user);
+		};
+
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.updateVoteVisibility = function (val) {
 			room.updateVoteVisibility(val, true);

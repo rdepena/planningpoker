@@ -50,6 +50,10 @@
 			});
 			my.voteRevealed = message.room.displayVotes;
 		};
+		// person kicked off
+		var onKick = function () {
+			my.kick();
+		};
 		//we either update or add a new user.
 		my.addUpdateUser = function (user) {
 			var exists = false;
@@ -77,7 +81,11 @@
 			user.vote = card;
 			//we send the vote over the wire
 			//TODO: send user not card/name combo.
-			socket.publish({eventType : events.VOTE, vote : card, name : user.name});
+			socket.publish({eventType : events.VOTE, vote : card, name : user.name });
+		};
+
+		my.kick = function() {
+			socket.publish({eventType : events.USER_KICK, name : user.name });
 		};
 
 		my.updateVoteVisibility = function (voteVisible, sendNotification) {
@@ -137,6 +145,10 @@
 						break;
 					case events.ROOM_STATUS:
 						onRoomStatus(message);
+						break;
+					case events.USER_KICK;
+						console.log("kick");
+						onKick();
 						break;
 					}
 				}

@@ -11,7 +11,7 @@
 		//we will use rooms to isolate messages.
 		var room = '';
 
-		//init the connectnection.
+		//init the connection
 		var rtms = io.connect(window.location.hostname);	
 		my.subscribe = function (options) {
 			room = options.roomName;

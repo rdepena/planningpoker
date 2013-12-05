@@ -78,6 +78,12 @@
             } else if (data.message.eventType === 'reset') {
                 //if the vote reset was effected.
                 roomCache.resetVotes(roomName);
+            } else if (data.message.eventType == 'kick') {
+                console.log('kick');
+            } else if (data.message.eventType == 'nudge') {
+                console.log('nudge');
+            } else if (data.message.eventType == 'msg') {
+                console.log('msg');
             }
 
             //we emit the event to the other clients.

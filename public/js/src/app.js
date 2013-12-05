@@ -25,7 +25,8 @@
 			VOTE : 'vote',
 			USER_JOIN : 'join',
 			VOTE_VISIBILITY_TOGGLE : 'toggle',
-			ROOM_STATUS : 'roomStatus'
+			ROOM_STATUS : 'roomStatus',
+			USER_KICK : 'kick'
 		});
 	//card deck.
 	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'caffeine']);
