@@ -28,7 +28,7 @@
 			ROOM_STATUS : 'roomStatus'
 		});
 	//card deck.
-	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'coffee']);
+	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'caffeine']);
 
 })(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
 /*global */
