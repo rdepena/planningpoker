@@ -65,11 +65,6 @@
 			$scope.currentUser.vote = card;
 			room.vote(card, $scope.currentUser);
 		};
-
-		$scope.kick = function(user) {
-			room.kick(user);
-		};
-
 		//accepts true or false and changes the state of vote visibility accordingly 
 		$scope.updateVoteVisibility = function (val) {
 			room.updateVoteVisibility(val, true);
@@ -79,6 +74,17 @@
 			//we send a value to send the notification.
 			room.resetVotes(true);
 		};
+        //additional commands
+        $scope.command = function(command, user) {
+            if (command == "kick") {
+                room.kick(user);
+            } else if (command == "message") {
+                var payload = prompt("What is your message?", "");
+                room.message(user, payload);
+            } else if (command == "nudge") {
+                room.nudge(user);
+            }
+        };
 	};
 
 })(this.planningShark = this.planningShark || {});

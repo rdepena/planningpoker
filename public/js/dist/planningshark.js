@@ -25,7 +25,13 @@
 			VOTE : 'vote',
 			USER_JOIN : 'join',
 			VOTE_VISIBILITY_TOGGLE : 'toggle',
-			ROOM_STATUS : 'roomStatus'
+			ROOM_STATUS : 'roomStatus',
+			USER_KICK : 'kick',
+            USER_KICKED : 'kicked',
+            USER_MESSAGE : 'message',
+            USER_MESSAGED : 'messaged',
+            USER_NUDGE : 'nudge',
+            USER_NUDGED : 'nudged'
 		});
 	//card deck.
 	planningShark.app.constant('deck', ['0', '1/2', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', 'caffeine']);
@@ -106,6 +112,17 @@
 			//we send a value to send the notification.
 			room.resetVotes(true);
 		};
+        //additional commands
+        $scope.command = function(command, user) {
+            if (command == "kick") {
+                room.kick(user);
+            } else if (command == "message") {
+                var payload = prompt("What is your message?", "");
+                room.message(user, payload);
+            } else if (command == "nudge") {
+                room.nudge(user);
+            }
+        };
 	};
 
 })(this.planningShark = this.planningShark || {});;/*jslint indent: 4, maxerr: 50, vars: true, nomen: true*/
@@ -193,11 +210,36 @@
 			angular.forEach(message.room.users, function (p) {
 				my.addUpdateUser({
 					name : p.name,
-					vote : p.vote
+					vote : p.vote,
+                    socketId : p.socketId
 				});
 			});
 			my.voteRevealed = message.room.displayVotes;
 		};
+		// person kicked off
+		var onKick = function (user) {
+            var location = 0;
+            angular.forEach(my.users, function (u) {
+                if (u.name === user.name) {
+                    my.users.splice(location, 1);
+                    return;
+                }
+                location++;
+            });
+		};
+
+        var onKicked = function () {
+            location.href = '/end';
+        };
+
+        var onMessaged = function (message) {
+            alert(message.payload);
+        };
+
+        var onNudged = function() {
+            jQuery("body").effect("shake");
+        };
+
 		//we either update or add a new user.
 		my.addUpdateUser = function (user) {
 			var exists = false;
@@ -225,7 +267,7 @@
 			user.vote = card;
 			//we send the vote over the wire
 			//TODO: send user not card/name combo.
-			socket.publish({eventType : events.VOTE, vote : card, name : user.name});
+			socket.publish({eventType : events.VOTE, vote : card, name : user.name });
 		};
 
 		my.updateVoteVisibility = function (voteVisible, sendNotification) {
@@ -259,6 +301,18 @@
 
 		};
 
+        my.kick = function(user) {
+            socket.publish({eventType : events.USER_KICK, name : user.name, socketId : user.socketId });
+        };
+
+        my.message = function(user, payload) {
+            socket.publish({eventType : events.USER_MESSAGE, payload : payload, socketId : user.socketId });
+        };
+
+        my.nudge = function(user) {
+            socket.publish({eventType : events.USER_NUDGE, socketId : user.socketId });
+        };
+
 		my.setupRoom = function (roomName) {
 			
 			my.roomName = roomName;
@@ -286,7 +340,19 @@
 					case events.ROOM_STATUS:
 						onRoomStatus(message);
 						break;
-					}
+                    case events.USER_KICK:
+						onKick(message);
+						break;
+                    case events.USER_KICKED:
+                        onKicked();
+                        break;
+                    case events.USER_MESSAGED:
+                        onMessaged(message);
+                        break;
+                    case events.USER_NUDGED:
+                        onNudged();
+                        break;
+                    }
 				}
 			};
 			//we use socket to abstract any subscription policy.
@@ -337,8 +403,8 @@
 		//we will use rooms to isolate messages.
 		var room = '';
 
-		//init the connectnection.
-		var rtms = io.connect(window.location.hostname);	
+		//init the connection
+		var rtms = io.connect(window.location.hostname);
 		my.subscribe = function (options) {
 			room = options.roomName;
 			rtms.on('event', function(data) {

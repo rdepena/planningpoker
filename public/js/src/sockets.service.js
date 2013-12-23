@@ -12,7 +12,7 @@
 		var room = '';
 
 		//init the connection
-		var rtms = io.connect(window.location.hostname);	
+		var rtms = io.connect(window.location.hostname);
 		my.subscribe = function (options) {
 			room = options.roomName;
 			rtms.on('event', function(data) {

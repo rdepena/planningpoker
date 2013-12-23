@@ -14,6 +14,7 @@
     <script src="vendor/jquery.js"></script>
     <script src="vendor/angular.min.js"></script>
     <script src="vendor/jquery.cookie.js"></script>
+    <script src="vendor/jquery-ui.min.js"></script>
     <script src="js/dist/planningshark.js"></script>
     <script src="/socket.io/socket.io.js"></script>
     <!-- end of JS -->
@@ -89,7 +90,7 @@
                   <th>
                     vote
                   </th>
-                  <th>
+                  <th ng-show="isMaster">
                     action
                   </th>
                 </thead>
@@ -102,8 +103,8 @@
                       <span ng-show="(user.vote != null && !voteRevealed())">voted</span>
                       <span ng-show="(user.vote == null)">joined</span>
                     </td>
-                    <td>
-                      <span class="btn" ng-click="command('kick', user)">kick</span><span class="btn" ng-click="command('nudge', user)">nudge</span><span class="btn" ng-click="command('msg', user)">msg</span>
+                    <td ng-show="isMaster">
+                      <span class="btn" ng-click="command('kick', user)">kick</span><span class="btn" ng-click="command('nudge', user)">nudge</span><span class="btn" ng-click="command('message', user)">msg</span>
                     </td>
                   </tr>
                 </tbody>

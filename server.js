@@ -11,6 +11,8 @@
         app = express(),
         port = process.env.PORT || 5000;
 
+    var clients = {};
+
     //configure the express app
     app.configure(function () {
         app.set('views', __dirname + '/views');
@@ -32,10 +34,13 @@
         res.render('index.html');
     });
 
+    app.get('/end', function (req, res) {
+        res.render('end.html');
+    });
+
     app.get('*', function (req, res) {
         res.render('404.html');
     });
-
 
     //Start the server:
     var server = http.createServer(app).listen(port, function () {
@@ -50,17 +55,21 @@
         io.set("polling duration", 10);
     });
     io.sockets.on('connection', function (socket) {
+        clients[socket.id] = socket;
         socket.on('broadcast', function (data) {
 
             //get the roomName from the payload.
             var roomName = data.room,
                 user = {
                     name : data.message.name || null,
-                    vote : data.message.vote || null
+                    vote : data.message.vote || null,
+                    socketId : data.message.socketId || this.id
                 };
             //if a user joins:
             if (data.message.eventType === 'join') {
                 //we add the user to the room:
+                //user.socketId = this.id;
+
                 roomCache.addUpdateUser(roomName, user);
                 //respond to the user who joined with the curroomName status.
                 socket.emit('event', {
@@ -79,11 +88,25 @@
                 //if the vote reset was effected.
                 roomCache.resetVotes(roomName);
             } else if (data.message.eventType == 'kick') {
-                console.log('kick');
+                roomCache.kick(roomName, user);
+                clients[user.socketId].emit('event', {
+                    message : {
+                        eventType : 'kicked'
+                    }
+                });
             } else if (data.message.eventType == 'nudge') {
-                console.log('nudge');
-            } else if (data.message.eventType == 'msg') {
-                console.log('msg');
+                clients[user.socketId].emit('event', {
+                    message : {
+                        eventType : 'nudged'
+                    }
+                });
+            } else if (data.message.eventType == 'message') {
+                clients[user.socketId].emit('event', {
+                    message : {
+                        eventType : 'messaged',
+                        payload : data.message.payload
+                    }
+                });
             }
 
             //we emit the event to the other clients.
