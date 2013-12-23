@@ -74,6 +74,17 @@
 			//we send a value to send the notification.
 			room.resetVotes(true);
 		};
+        //additional commands
+        $scope.command = function(command, user) {
+            if (command == "kick") {
+                room.kick(user);
+            } else if (command == "message") {
+                var payload = prompt("What is your message?", "");
+                room.message(user, payload);
+            } else if (command == "nudge") {
+                room.nudge(user);
+            }
+        };
 	};
 
 })(this.planningShark = this.planningShark || {});

@@ -45,11 +45,36 @@
 			angular.forEach(message.room.users, function (p) {
 				my.addUpdateUser({
 					name : p.name,
-					vote : p.vote
+					vote : p.vote,
+                    socketId : p.socketId
 				});
 			});
 			my.voteRevealed = message.room.displayVotes;
 		};
+		// person kicked off
+		var onKick = function (user) {
+            var location = 0;
+            angular.forEach(my.users, function (u) {
+                if (u.name === user.name) {
+                    my.users.splice(location, 1);
+                    return;
+                }
+                location++;
+            });
+		};
+
+        var onKicked = function () {
+            location.href = '/end';
+        };
+
+        var onMessaged = function (message) {
+            alert(message.payload);
+        };
+
+        var onNudged = function() {
+            jQuery("body").effect("shake");
+        };
+
 		//we either update or add a new user.
 		my.addUpdateUser = function (user) {
 			var exists = false;
@@ -77,7 +102,7 @@
 			user.vote = card;
 			//we send the vote over the wire
 			//TODO: send user not card/name combo.
-			socket.publish({eventType : events.VOTE, vote : card, name : user.name});
+			socket.publish({eventType : events.VOTE, vote : card, name : user.name });
 		};
 
 		my.updateVoteVisibility = function (voteVisible, sendNotification) {
@@ -111,6 +136,18 @@
 
 		};
 
+        my.kick = function(user) {
+            socket.publish({eventType : events.USER_KICK, name : user.name, socketId : user.socketId });
+        };
+
+        my.message = function(user, payload) {
+            socket.publish({eventType : events.USER_MESSAGE, payload : payload, socketId : user.socketId });
+        };
+
+        my.nudge = function(user) {
+            socket.publish({eventType : events.USER_NUDGE, socketId : user.socketId });
+        };
+
 		my.setupRoom = function (roomName) {
 			
 			my.roomName = roomName;
@@ -138,7 +175,19 @@
 					case events.ROOM_STATUS:
 						onRoomStatus(message);
 						break;
-					}
+                    case events.USER_KICK:
+						onKick(message);
+						break;
+                    case events.USER_KICKED:
+                        onKicked();
+                        break;
+                    case events.USER_MESSAGED:
+                        onMessaged(message);
+                        break;
+                    case events.USER_NUDGED:
+                        onNudged();
+                        break;
+                    }
 				}
 			};
 			//we use socket to abstract any subscription policy.

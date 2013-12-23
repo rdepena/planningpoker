@@ -45,6 +45,10 @@ module.exports = function () {
     my.getRoomByName(roomName).displayVotes = voteVisible;
   };
 
+  my.kick = function(roomName, user) {
+    my.getRoomByName(roomName).users[user.name] = null;
+  };
+
   return my;
   
 }();
