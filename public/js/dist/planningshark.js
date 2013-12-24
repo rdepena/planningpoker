@@ -10,10 +10,10 @@
 	//configure our planning module.:
 	planningShark.app.config(function ($routeProvider) {
 		$routeProvider
-			.when('/', { controller : planningShark.poker.createCtrl, templateUrl : 'createjoin.html' })
-			.when('/room/:roomName/:userName', {controller : planningShark.poker.roomCtrl, templateUrl: 'room.html'})
-			.when('/room/:roomName/:userName/:master', {controller : planningShark.poker.roomCtrl, templateUrl: 'room.html'})
-			.when('/join/:roomName', { controller : planningShark.poker.joinCtrl, templateUrl : 'createjoin.html'})
+			.when('/', { controller : planningShark.poker.createCtrl, templateUrl : 'templates/createjoin.html' })
+			.when('/room/:roomName/:userName', {controller : planningShark.poker.roomCtrl, templateUrl: 'templates/room.html'})
+			.when('/room/:roomName/:userName/:master', {controller : planningShark.poker.roomCtrl, templateUrl: 'templates/room.html'})
+			.when('/join/:roomName', { controller : planningShark.poker.joinCtrl, templateUrl : 'templates/createjoin.html'})
 			.otherwise({redirectTo: '/'});
 	});
 

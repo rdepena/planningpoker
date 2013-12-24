@@ -1,0 +1,27 @@
+<div class="row">
+    <div class="col-md-8">
+        <form ng-submit="join()">
+            <br>
+            <fieldset>
+                <input type="text" name="userName" ng-model="userName" placeholder="who are you today?" required />
+                <input type="hidden" name="roomName" ng-model="roomName" />                
+            </fieldset>
+            <br>
+            <button class='btn btn-primary'>Join</button>
+            <!-- //todo: get this out of there. --> 
+            <br>
+            <br>
+            <div ng-show="openSessions">
+              <p>
+                <span>or perhaps you want to re-join an earlier session:</span>
+              </p>
+              <ul >
+                <li ng-repeat="session in openSessions">
+                  <a ng-href="#{{session.path}}">session from {{session.joinDate | date : 'EEEE, MMMM d @ h:mm a'}}</a>
+                  <i class="icon-remove" ng-click="delete(session)"></i>
+                </li>
+              </ul>
+            </div>
+        </form>
+    </div>
+</div>
