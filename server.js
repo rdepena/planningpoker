@@ -49,11 +49,6 @@
 
     //Sockets
     var io = require('socket.io').listen(server);
-    //Heroku does not support web sockets, so we fallback to polling:
-    io.configure(function () {
-        io.set("transports", ["xhr-polling"]);
-        io.set("polling duration", 10);
-    });
     io.sockets.on('connection', function (socket) {
         clients[socket.id] = socket;
         socket.on('broadcast', function (data) {
