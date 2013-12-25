@@ -20,16 +20,30 @@
     body {
         padding-top: 50px;
     }
+    .footer {
+      padding-top: 19px;
+      color: #777;
+      border-top: 1px solid #e5e5e5;
+    }
 </style>
   <body ng-app="planningShark">
-<div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-      <div class="container">
-        <div class="navbar-header">
-          <a class="navbar-brand" href="#">Planning Shark</a>
+
+        <!-- top bar -->
+        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+          <div class="container">
+            <a href="https://github.com/rdepena/planningpoker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+          </div>
+            <div class="navbar-header">
+              <a class="navbar-brand" href="#">Planning Shark</a>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="container" ng-view>
-    </div>
+
+        <!-- angular ng-view --> 
+        <div class="container">
+                <div ng-view></div>
+                <div class="footer">
+                <p>found a bug? <a href="https://github.com/rdepena/planningpoker/issues/new">Report it</a></p>
+                </div>
+        </div>
   </body>
 </html>
