@@ -29,6 +29,7 @@
 		var onUserJoin = function (message) {
 			my.addUpdateUser({
 				name : message.name,
+                socketId: message.socketId,
 				vote : message.vote
 			});
 		};
@@ -68,11 +69,11 @@
         };
 
         var onMessaged = function (message) {
-            alert(message.payload);
+            $.growl.notice({ title : "Message", message: message.payload });
         };
 
         var onNudged = function() {
-            jQuery("body").effect("shake");
+            $("body").effect("shake");
         };
 
 		//we either update or add a new user.
@@ -81,6 +82,7 @@
 			angular.forEach(my.users, function (u) {
 				if (u.name === user.name) {
 					u.vote = user.vote;
+                    u.socketId = user.socketId;
 					exists = true;
 				}
 			});

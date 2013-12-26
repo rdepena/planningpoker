@@ -60,10 +60,11 @@
                     vote : data.message.vote || null,
                     socketId : data.message.socketId || this.id
                 };
+
             //if a user joins:
             if (data.message.eventType === 'join') {
                 //we add the user to the room:
-                //user.socketId = this.id;
+                data.message.socketId = this.id;
 
                 roomCache.addUpdateUser(roomName, user);
                 //respond to the user who joined with the curroomName status.
