@@ -100,9 +100,16 @@
                 clients[user.socketId].emit('event', {
                     message : {
                         eventType : 'messaged',
+                        type : 'private',
+                        from : data.message.from,
                         payload : data.message.payload
                     }
                 });
+            } else if (data.message.eventType == 'subject') {
+                roomCache.setSubject(roomName, data.message.payload);
+            } else if (data.message.eventType == 'messageall') {
+                data.message.eventType = 'messaged';
+                data.message.type = 'public';
             }
 
             //we emit the event to the other clients.

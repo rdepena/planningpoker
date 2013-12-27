@@ -34,9 +34,9 @@
             </td>
             <td>
               <div class="btn-group">
-                <button ng-show="isMaster" type="button" class="btn btn-default" ng-click="command('kick', user)">kick</button>
-                <button ng-show="isMaster" type="button" class="btn btn-default" ng-click="command('nudge', user)">nudge</button>
-                <button type="button" class="btn btn-default" ng-click="command('message', user)">msg</button>
+                <button ng-show="(isMaster && user.name != currentUser.name)" type="button" class="btn btn-default" ng-click="command('kick', user)">kick</button>
+                <button ng-show="(isMaster && user.name != currentUser.name)" type="button" class="btn btn-default" ng-click="command('nudge', user)">nudge</button>
+                <button ng-show="(user.name != currentUser.name)" type="button" class="btn btn-default" ng-click="command('message', user, currentUser.name)">msg</button>
               </div>
             </td>
           </tr>
@@ -62,12 +62,16 @@
       </table>
     </div>
     <div>
-      <button ng-show="(isMaster && !voteRevealed())" class="btn btn-primary" ng-click='updateVoteVisibility(true)'>reveal</button>
-      <button ng-show="(isMaster && voteRevealed())" class="btn btn-primary" ng-click='updateVoteVisibility(false)'>hide</button>
-      <button ng-show="isMaster" class="btn btn-default" ng-click='resetVotes()'>reset</button>
+      <button ng-show="(isMaster)" class="btn btn-primary" ng-click="command('subject')">subject</button>
+      <button ng-show="(subjectIsSet())" class="btn btn-primary" ng-click="command('remind')">remind</button>
+      <button ng-show="(isMaster)" class="btn btn-primary" ng-click="command('messageall', user, currentUser.name)">message</button>
+      <button ng-show="(isMaster && !voteRevealed())" class="btn btn-primary" ng-click="updateVoteVisibility(true)">reveal</button>
+      <button ng-show="(isMaster && voteRevealed())" class="btn btn-primary" ng-click="updateVoteVisibility(false)">hide</button>
+      <button ng-show="isMaster" class="btn btn-default" ng-click="resetVotes()">reset</button>
       <p>
         send this link so that others can <a target="_blank" href="#/join/{{roomName}}" >join the planning</a>
       </p>
     </div>
   </div>
 </div>
+<div id="dialog"></div>

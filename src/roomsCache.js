@@ -10,6 +10,7 @@ module.exports = function () {
     //initialize room:
     var room = rooms[roomName] = {};
     room.users = {};
+    room.subject = null;
     room.displayVotes = false;
     return room;
   };
@@ -38,6 +39,7 @@ module.exports = function () {
         room.users[p].vote = null;
       }
     }
+    room.subject = null;
   };
 
   //set the room vote visibility.
@@ -47,6 +49,10 @@ module.exports = function () {
 
   my.kick = function(roomName, user) {
     my.getRoomByName(roomName).users[user.name] = null;
+  };
+
+  my.setSubject = function(roomName, subject) {
+    my.getRoomByName(roomName).subject = subject;
   };
 
   return my;
