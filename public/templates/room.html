@@ -17,7 +17,7 @@
         <th>
           vote
         </th>
-        <th ng-show="isMaster">
+        <th>
           action
         </th>
       </thead>
@@ -32,10 +32,10 @@
               <span ng-show="(user.vote != null && !voteRevealed())">voted</span>
               <span ng-show="(user.vote == null)">joined</span>
             </td>
-            <td ng-show="isMaster">
+            <td>
               <div class="btn-group">
-                <button type="button" class="btn btn-default" ng-click="command('kick', user)">kick</button>
-                <button type="button" class="btn btn-default" ng-click="command('nudge', user)">nudge</button>
+                <button ng-show="isMaster" type="button" class="btn btn-default" ng-click="command('kick', user)">kick</button>
+                <button ng-show="isMaster" type="button" class="btn btn-default" ng-click="command('nudge', user)">nudge</button>
                 <button type="button" class="btn btn-default" ng-click="command('message', user)">msg</button>
               </div>
             </td>
