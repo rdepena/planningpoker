@@ -11,6 +11,7 @@
 		var my = {};
 		my.users = [];
 		my.voteRevealed = false;
+        my.subjectIsSet = false;
 		my.voteCount = null;
 		my.roomName = null;
 
@@ -20,6 +21,7 @@
 			my.addUpdateUser(
 				{
 					name : message.name,
+                    socketId: message.socketId,
 					vote : message.vote
 				}
 			);
@@ -69,11 +71,33 @@
         };
 
         var onMessaged = function (message) {
-            $.growl.notice({ title : "Message", message: message.payload });
+            if (message.payload !== null) {
+                $.growl.notice({ title : (message.type === 'private' ? "Private " : "Room ") + "Message", message: message.from + ": " + message.payload });
+            }
         };
 
         var onNudged = function() {
             $("body").effect("shake");
+        };
+
+        var onSubject = function(message) {
+            if (message.payload !== null) {
+                my.subjectIsSet = true;
+                if (message.payload.indexOf("http") === 0) {
+                    var width = 800;
+                    var height = 600;
+                    var w_offset = 40;
+                    var h_offset = 60;
+
+                    $("#dialog").html($("<iframe width='" + (width - w_offset) + "' height='" + (height - h_offset) + "' />").attr("src", message.payload)).dialog({ width: width, height: height, modal: true });
+                } else {
+                    $("#dialog").html(message.payload).dialog({ width: 300, height: 140, modal: true });
+                }
+            }
+        };
+
+        var onRemind = function() {
+            $("#dialog").dialog();
         };
 
 		//we either update or add a new user.
@@ -104,11 +128,10 @@
 			user.vote = card;
 			//we send the vote over the wire
 			//TODO: send user not card/name combo.
-			socket.publish({eventType : events.VOTE, vote : card, name : user.name });
+			socket.publish({eventType : events.VOTE, vote : card, name : user.name, socketId : user.socketId });
 		};
 
 		my.updateVoteVisibility = function (voteVisible, sendNotification) {
-
 			//return parameter for chaining.
 			my.voteRevealed = voteVisible;
 
@@ -116,6 +139,7 @@
 			if (!sendNotification) {
 				return;
 			}
+
 			//send update over the wire.
 			socket.publish(
 				{
@@ -123,7 +147,6 @@
 					reveal : voteVisible
 				}
 			);
-
 		};
 
 		my.resetVotes = function (sendNotification) {
@@ -131,23 +154,35 @@
 				p.vote = null;
 			});
 			my.voteCount = null;
+            my.subjectIsSet = null;
 			my.updateVoteVisibility(false, false);
 			if (sendNotification) {
 				socket.publish({eventType : events.VOTE_RESET});
 			}
-
 		};
 
         my.kick = function(user) {
             socket.publish({eventType : events.USER_KICK, name : user.name, socketId : user.socketId });
         };
 
-        my.message = function(user, payload) {
-            socket.publish({eventType : events.USER_MESSAGE, payload : payload, socketId : user.socketId });
+        my.message = function(user, from, payload) {
+            socket.publish({eventType : events.USER_MESSAGE, from : from, payload : payload, socketId : user.socketId });
         };
 
         my.nudge = function(user) {
             socket.publish({eventType : events.USER_NUDGE, socketId : user.socketId });
+        };
+
+        my.subject = function(payload) {
+            socket.publish({eventType : events.SUBJECT, payload: payload });
+        };
+
+        my.messageall = function(from, payload) {
+            socket.publish({eventType : events.MESSAGEALL, from : from, payload: payload });
+        };
+
+        my.remind = function() {
+            onRemind();
         };
 
 		my.setupRoom = function (roomName) {
@@ -155,6 +190,7 @@
 			my.roomName = roomName;
 			my.users = [];
 			my.voteRevealed = false;
+            my.subjectIsSet = false;
 			my.voteCount = null;
 
 			//sets up the socket subscription.
@@ -188,6 +224,9 @@
                         break;
                     case events.USER_NUDGED:
                         onNudged();
+                        break;
+                    case events.SUBJECT:
+                        onSubject(message);
                         break;
                     }
 				}

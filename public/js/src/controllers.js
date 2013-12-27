@@ -74,17 +74,37 @@
 			//we send a value to send the notification.
 			room.resetVotes(true);
 		};
+
+        $scope.subjectIsSet = function() {
+            return room.subjectIsSet;
+        };
+
         //additional commands
-        $scope.command = function(command, user) {
+        $scope.command = function(command, user, from) {
+            var payload;
+
             if (command == "kick") {
                 room.kick(user);
             } else if (command == "message") {
-                var payload = prompt("What is your message?", "");
-                room.message(user, payload);
+                room.message(user, from, getMessage());
+            } else if (command == "messageall") {
+                room.messageall(from, getMessage());
             } else if (command == "nudge") {
                 room.nudge(user);
+            } else if (command == "subject") {
+                room.subject(getSubjectDetails());
+            } else if (command == "remind") {
+                room.remind();
             }
         };
+
+        function getMessage() {
+            return prompt("What is your message?", "");
+        }
+
+        function getSubjectDetails() {
+            return prompt("What is the subject of this session?", "");
+        }
 	};
 
 })(this.planningShark = this.planningShark || {});
