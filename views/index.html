@@ -8,16 +8,6 @@
     <link href="css/bootstrap-theme.css" rel="stylesheet" media="screen">
     <link href="css/jquery.growl.css" rel="stylesheet" media="screen">
     <link href="css/themes/ui-darkness/jquery-ui.min.css" rel="stylesheet" media="screen">
-    <!-- JS -->
-    <script src="vendor/jquery.js"></script>
-    <script src="vendor/angular.min.js"></script>
-    <script src="vendor/jquery.cookie.js"></script>
-    <script src="vendor/jquery-ui.min.js"></script>
-    <script src="vendor/bootstrap.min.js"></script>
-    <script src="vendor/jquery.growl.js"></script>
-    <script src="js/dist/planningshark.js"></script>
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- end of JS -->
   </head>
   <style>
     body {
@@ -28,25 +18,48 @@
       color: #777;
       border-top: 1px solid #e5e5e5;
     }
+    .roomform {
+        max-width: 500px;
+        margin-bottom: 15px;
+    }
+    .join-info {
+        margin-top: 10px;
+    }
+    .card-list {
+        margin-top: 10px;
+    }
+    .participant-list {
+        margin-top: 30px;
+    }
 </style>
   <body ng-app="planningShark">
-
-        <!-- top bar -->
-        <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
-          <div class="container">
-            <a href="https://github.com/rdepena/planningpoker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
-          </div>
-            <div class="navbar-header">
-              <a class="navbar-brand" href="#">Planning Shark</a>
-            </div>
+    <!-- top bar -->
+    <div class="navbar navbar-inverse navbar-fixed-top" role="navigation">
+      <div class="container">
+        <a href="https://github.com/rdepena/planningpoker"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_gray_6d6d6d.png" alt="Fork me on GitHub"></a>
+        <div class="navbar-header">
+          <a class="navbar-brand" href="#">Planning Shark</a>
         </div>
+      </div>
+    </div>
 
-        <!-- angular ng-view --> 
-        <div class="container">
-                <div ng-view></div>
-                <div class="footer">
-                <p>found a bug? <a href="https://github.com/rdepena/planningpoker/issues/new">Report it</a></p>
-                </div>
+    <!-- angular ng-view --> 
+    <div class="container">
+        <div ng-view>
         </div>
+        <div class="footer">
+        <p>Found a bug? <a href="https://github.com/rdepena/planningpoker/issues/new">Report it</a></p>
+        </div>
+    </div>
+    <!-- JS -->
+    <script src="vendor/jquery.js"></script>
+    <script src="vendor/angular.min.js"></script>
+    <script src="vendor/jquery.cookie.js"></script>
+    <script src="vendor/jquery-ui.min.js"></script>
+    <script src="vendor/bootstrap.min.js"></script>
+    <script src="vendor/jquery.growl.js"></script>
+    <script src="js/dist/planningshark.js"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <!-- end of JS -->
   </body>
 </html>

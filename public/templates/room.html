@@ -3,22 +3,22 @@
     <h4>
       Participating as {{currentUser.name}}:
     </h4>
-    <div class="btn-group">
+    <div class="btn-group card-list">
       <button type="button" ng-click="vote(card)" class="btn btn-default" ng-class="{'btn-primary' : currentUser.vote == card}" ng-repeat="card in deck">{{card}}</button>
     </div>
   </div>
-  <div class="col-md-8">
+  <div class="col-md-8 participant-list">
       <h4>Participant list:</h4>
     <table class="table table-striped table-bordered table-responsive" >
       <thead>
         <th>
-          participant
+          Participant
         </th>
         <th>
-          vote
+          Vote
         </th>
         <th>
-          action
+          Action
         </th>
       </thead>
       <tbody>
@@ -43,11 +43,11 @@
         </tbody>
       </table>
     <div ng-show='voteRevealed() && voteCounts()'>
-      <h4>vote summary:</h4>
+      <h4>Vote summary:</h4>
       <table class="table table-striped table-condensed table-bordered" style="width:40%">
         <thead>
-          <th>count</th>
-          <th>vote</th>
+          <th>Count</th>
+          <th>Vote</th>
         </thead>
         <tbody>
           <tr ng-repeat="voteCount in voteCounts() | orderBy:'count':true" ng-show="voteCount.vote">
@@ -62,14 +62,14 @@
       </table>
     </div>
     <div>
-      <button ng-show="(isMaster)" class="btn btn-primary" ng-click="command('subject')">subject</button>
-      <button ng-show="(subjectIsSet())" class="btn btn-primary" ng-click="command('remind')">remind</button>
-      <button ng-show="(isMaster)" class="btn btn-primary" ng-click="command('messageall', user, currentUser.name)">message</button>
       <button ng-show="(isMaster && !voteRevealed())" class="btn btn-primary" ng-click="updateVoteVisibility(true)">reveal</button>
       <button ng-show="(isMaster && voteRevealed())" class="btn btn-primary" ng-click="updateVoteVisibility(false)">hide</button>
       <button ng-show="isMaster" class="btn btn-default" ng-click="resetVotes()">reset</button>
-      <p>
-        send this link so that others can <a target="_blank" href="#/join/{{roomName}}" >join the planning</a>
+      <button ng-show="(isMaster)" class="btn btn-default" ng-click="command('subject')">subject</button>
+      <button ng-show="(subjectIsSet())" class="btn btn-default" ng-click="command('remind')">remind</button>
+      <button ng-show="(isMaster)" class="btn btn-default" ng-click="command('messageall', user, currentUser.name)">message</button>
+      <p class="join-info">
+        Send this link so that others can <a target="_blank" href="#/join/{{roomName}}" >join the planning</a>
       </p>
     </div>
   </div>

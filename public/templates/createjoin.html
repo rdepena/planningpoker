@@ -1,16 +1,16 @@
 <div class="row">
     <div class="col-md-8">
-        <form ng-submit="join()">
+        <form ng-submit="">
             <br>
             <fieldset>
-                <input type="text" name="userName" ng-model="userName" placeholder="who are you today?" required />
-                <input type="hidden" name="roomName" ng-model="roomName" />                
+                <div class="input-group roomform">
+                    <input name="userName" ng-model="userName"  required placeholder="who are you today?" class="form-control" >
+                    <input type="hidden" name="roomName" ng-model="roomName" />
+                    <span class="input-group-btn">
+                      <button class="btn btn-default" ng-click="join()" type="submit">Join!</button>
+                    </span>
+                </div>
             </fieldset>
-            <br>
-            <button class='btn btn-primary'>Join</button>
-            <!-- //todo: get this out of there. --> 
-            <br>
-            <br>
             <div ng-show="openSessions">
               <p>
                 <span>or perhaps you want to re-join an earlier session:</span>
