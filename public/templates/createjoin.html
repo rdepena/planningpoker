@@ -1,13 +1,13 @@
 <div class="row">
     <div class="col-md-8">
-        <form ng-submit="">
+        <form ng-submit="join()">
             <br>
             <fieldset>
                 <div class="input-group roomform">
                     <input name="userName" ng-model="userName"  required placeholder="who are you today?" class="form-control" >
                     <input type="hidden" name="roomName" ng-model="roomName" />
                     <span class="input-group-btn">
-                      <button class="btn btn-default" ng-click="join()" type="submit">Join!</button>
+                      <button class="btn btn-default" type="submit">Join!</button>
                     </span>
                 </div>
             </fieldset>
