@@ -10,10 +10,11 @@
 	//createCtrl is in charge of creating the room.
 	planningShark.poker.createCtrl = function ($scope, $location, cookies) {
 		$scope.openSessions = cookies.get();
+		$scope.deckName = 'a';
 		//we create a random string to be used as a room ID.
 		$scope.join = function () {
 			var roomName = Math.random().toString(36).substring(7),
-				path = '/room/' + roomName + '/' + $scope.userName + '/true';
+				path = '/room/' + roomName + '/' + $scope.deckName + '/' +$scope.userName + '/true';
 			$location.path(path);
 		};
 
@@ -28,10 +29,11 @@
 	planningShark.poker.joinCtrl = function ($scope, $location, $routeParams) {
 
 		//this property represents the existing room Id that we will join.
+		$scope.deckName = $routeParams.deckName;
 		$scope.roomName = $routeParams.roomName;
 		//we join a room that has been passed via the route params.
 		$scope.join = function () {
-			var path = '/room/' + $scope.roomName + '/' + $scope.userName;
+			var path = '/room/' + $scope.roomName + '/' + $scope.deckName + '/' + $scope.userName;
 			$location.path(path);
 		};
 	};
@@ -40,6 +42,7 @@
 	planningShark.poker.roomCtrl = function ($scope, $http, $location, $routeParams, deck, room) {
 		//set values for the view:
 		$scope.currentUser = { name : $routeParams.userName };
+		$scope.deckName = $routeParams.deckName;
 		$scope.roomName = $routeParams.roomName;
 		$scope.isMaster = $routeParams.master === 'true';
 		$scope.deck = deck;
@@ -50,7 +53,7 @@
 		$scope.users = room.users;
 		room.join($scope.roomName, path, $scope.currentUser);
 
-		//expose room logic: 
+		//expose room logic:
 
 		$scope.voteRevealed =  function () {
 			return room.voteRevealed;
@@ -65,7 +68,7 @@
 			$scope.currentUser.vote = card;
 			room.vote(card, $scope.currentUser);
 		};
-		//accepts true or false and changes the state of vote visibility accordingly 
+		//accepts true or false and changes the state of vote visibility accordingly
 		$scope.updateVoteVisibility = function (val) {
 			room.updateVoteVisibility(val, true);
 		};

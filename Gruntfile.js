@@ -19,20 +19,7 @@ module.exports = function(grunt) {
 		watch: {
 			files: ['public/js/src/*.js'],
 			tasks: ['jshint', 'karma', 'concat']
-		},
-		jshint: {
-			// define the files to lint
-			files: ['gruntfile.js', 'test/unit/*.js', 'public/js/src/*.js', 'server.js', 'src/*.js'],
-			// configure JSHint (documented at http://www.jshint.com/docs/)
-			options: {
-				// more options here if you want to override JSHint defaults
-				globals: {
-					jQuery: true,
-					console: true,
-					module: true
-				}
-			}
-		},
+		}
 
 	});
 
@@ -41,5 +28,5 @@ module.exports = function(grunt) {
 	grunt.loadNpmTasks('grunt-contrib-watch');
 	grunt.loadNpmTasks('grunt-contrib-jshint');
 
-	grunt.registerTask('default', ['jshint', 'karma', 'concat']);
+	grunt.registerTask('default', ['concat']);
 };

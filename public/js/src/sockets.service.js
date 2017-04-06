@@ -12,7 +12,9 @@
 		var room = '';
 
 		//init the connection
-		var rtms = io.connect(window.location.hostname);
+		//var rtms = io.connect(window.location.hostname);
+		var rtms = io();
+		rtms.connect();
 		my.subscribe = function (options) {
 			room = options.roomName;
 			rtms.on('event', function(data) {
@@ -22,12 +24,12 @@
 					});
 				}
 			});
-			
+
 			rtms.emit('joinRoom', { room : room });
 		};
 
 		my.publish = function (msg) {
-			rtms.emit('broadcast', 
+			rtms.emit('broadcast',
 			{
 				room : room,
 				message : msg

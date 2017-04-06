@@ -23,7 +23,7 @@ module.exports = function(config) {
 
     // list of files to exclude
     exclude: [
-      
+
     ],
 
 
@@ -33,7 +33,7 @@ module.exports = function(config) {
 
 
     // web server port
-    port: 9876,
+    port: 8899,
 
 
     // enable / disable colors in the output (reporters and logs)
@@ -57,7 +57,7 @@ module.exports = function(config) {
     // - Safari (only Mac)
     // - PhantomJS
     // - IE (only Windows)
-    browsers: ['Chrome'],
+    browsers: ['Chromium'],
 
 
     // If browser does not capture in given timeout [ms], kill it
